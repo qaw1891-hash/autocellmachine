@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>細胞自動機 - 網頁版</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body { font-family: "Microsoft JhengHei", sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        #setup-container, #game-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 500px; width: 100%; text-align: center; margin-bottom: 20px; }
+        #game-container { max-width: 800px; display: none; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        select, input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background-color: #007bff; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 10px; }
+        button:hover { background-color: #0056b3; }
+        h2, h3 { margin-top: 0; color: #333; }
+        canvas { border: 1px solid #ccc; background-color: #fff; max-width: 100%; height: auto; cursor: pointer; margin-top: 15px; }
+        #status-title { font-size: 16px; font-weight: bold; margin-bottom: 10px; color: #0056b3; }
+        .hint { font-size: 13px; color: #666; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="setup-container">
+        <h2>細胞自動機 - 初始參數設定</h2>
+        <div class="form-group">
+            <label>1. 選擇邊界規則:</label>
+            <select id="rule-mode">
+                <option value="1">1. 無邊界</option>
+                <option value="2">2. 都不相接</option>
+                <option value="3">3. 僅左右相接</option>
+                <option value="4">4. 上下相接 + 左右相接</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>2. 設定其餘參數:</label>
+            <div style="margin-bottom: 8px;">
+                <span style="display:inline-block; width:100px;">列數 (Rows):</span>
+                <input type="number" id="rows-input" value="30" min="1" style="width:100px;" disabled>
+            </div>
+            <div style="margin-bottom: 8px;">
+                <span style="display:inline-block; width:100px;">欄數 (Cols):</span>
+                <input type="number" id="cols-input" value="30" min="1" style="width:100px;" disabled>
+            </div>
+            <div>
+                <span style="display:inline-block; width:100px;">更新間隔 (秒):</span>
+                <input type="number" id="interval-input" value="0.2" step="0.1" min="0.01" style="width:100px;">
+            </div>
+        </div>
+        <button id="start-setup-btn">確定並開始設定初始格</button>
+    </div>
+
+    <div id="game-container">
+        <div id="status-title">請點擊網格設定初始點，完成後按【空白鍵】開始</div>
+        <canvas id="grid-canvas"></canvas>
+        <div class="hint">控制說明：【空白鍵】暫停/開始 | 暫停時可用鍵盤【 ← 】【 → 】鍵前後查看歷史盤數</div>
+        <button id="back-btn" style="background-color: #6c757d; width: auto; padding: 5px 15px;">重新設定</button>
+    </div>
+
+    <script>
+        // 介面連動：選無邊界時鎖定行列數
+        const ruleModeSelect = document.getElementById('rule-mode');
+        const rowsInput = document.getElementById('rows-input');
+        const colsInput = document.getElementById('cols-input');
+
+        ruleModeSelect.addEventListener('change', () => {
+            if (ruleModeSelect.value === "1") {
+                rowsInput.disabled = true;
+                colsInput.disabled = true;
+            } else {
+                rowsInput.disabled = false;
+                colsInput.disabled = false;
+            }
+        });
+
+        // 遊戲變數
+        let rows, cols, intervalSec, ruleMode;
+        let array = [];
+        let historyArrays = [];
+        let historyOffsets = []; // 紀錄 (r_offset, c_offset)
+        let currentROffsetTotal = 0;
+        let currentCOffsetTotal = 0;
+        let seenPatterns = {};
+        let roundNum = 0;
+        let currentViewIdx = 0;
+
+        let isSettingMode = true;
+        let isPaused = true;
+        let isTerminated = false;
+        let terminationReason = "";
+        let gameIntervalId = null;
+
+        const canvas = document.getElementById('grid-canvas');
+        const ctx = canvas.getContext('2d');
+        const statusTitle = document.getElementById('status-title');
+
+        const ruleNames = {
+            1: "動態無邊界",
+            2: "都不相接",
+            3: "僅左右相接",
+            4: "上下相接+左右相接"
+        };
+
+        // 啟動按鈕監聽
+        document.getElementById('start-setup-btn').addEventListener('click', () => {
+            ruleMode = parseInt(ruleModeSelect.value);
+            intervalSec = parseFloat(document.getElementById('interval-input').value);
+            
+            if (ruleMode === 1) {
+                rows = 15;
+                cols = 15;
+            } else {
+                rows = parseInt(rowsInput.value);
+                cols = parseInt(colsInput.value);
+            }
+
+            if (isNaN(rows) || rows <= 0 || isNaN(cols) || cols <= 0 || isNaN(intervalSec) || intervalSec <= 0) {
+                alert("請輸入正確的數值！");
+                return;
+            }
+
+            // 初始化遊戲狀態
+            array = Array(rows).fill().map(() => Array(cols).fill(0));
+            historyArrays = [];
+            historyOffsets = [(0, 0)];
+            currentROffsetTotal = 0;
+            currentCOffsetTotal = 0;
+            seenPatterns = {};
+            roundNum = 0;
+            currentViewIdx = 0;
+            isSettingMode = true;
+            isPaused = true;
+            isTerminated = false;
+            terminationReason = "";
+            if (gameIntervalId) clearInterval(gameIntervalId);
+
+            document.getElementById('setup-container').style.display = 'none';
+            document.getElementById('game-container').style.display = 'block';
+
+            statusTitle.innerText = `[${ruleNames[ruleMode]}] 請點擊網格設定初始點，完成後按【空白鍵】開始`;
+            render();
+        });
+
+        document.getElementById('back-btn').addEventListener('click', () => {
+            if (gameIntervalId) clearInterval(gameIntervalId);
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('setup-container').style.display = 'block';
+        });
+
+        // 核心演算法：檢查邊緣並外擴
+        function padArrayEdges(arr) {
+            const r = arr.length;
+            const c = arr[0].length;
+
+            const needTop = arr[0].some(v => v === 1);
+            const needBottom = arr[r-1].some(v => v === 1);
+            const needLeft = arr.some(row => row[0] === 1);
+            const needRight = arr.some(row => row[c-1] === 1);
+
+            if (!document.getElementById('start-setup-btn')) return { arr, rOff: 0, cOff: 0 }; // 安全檢查
+            if (!(needTop || needBottom || needLeft || needRight)) {
+                return { newArr: arr, rOff: 0, cOff: 0 };
+            }
+
+            const newRows = r + (needTop ? 1 : 0) + (needBottom ? 1 : 0);
+            const newCols = c + (needLeft ? 1 : 0) + (needRight ? 1 : 0);
+
+            const newArr = Array(newRows).fill().map(() => Array(newCols).fill(0));
+            const rOff = needTop ? 1 : 0;
+            const cOff = needLeft ? 1 : 0;
+
+            for (let i = 0; i < r; i++) {
+                for (let j = 0; j < c; j++) {
+                    newArr[i + rOff][j + cOff] = arr[i][j];
+                }
+            }
+            return { newArr, rOff, cOff };
+        }
+
+        // 核心演算法：更新盤面
+        function updateArray(arr, mode) {
+            let rOff = 0, cOff = 0;
+            if (mode === 1) {
+                const padResult = padArrayEdges(arr);
+                arr = padResult.newArr;
+                rOff = padResult.rOff;
+                cOff = padResult.cOff;
+            }
+
+            const r = arr.length;
+            const c = arr[0].length;
+            const newArr = Array(r).fill().map(() => Array(c).fill(0));
+
+            for (let i = 0; i < r; i++) {
+                for (let j = 0; j < c; j++) {
+                    let total = 0;
+
+                    // 上方
+                    if (i > 0) total += arr[i - 1][j];
+                    else if (mode === 4) total += arr[r - 1][j];
+
+                    // 下方
+                    if (i < r - 1) total += arr[i + 1][j];
+                    else if (mode === 4) total += arr[0][j];
+
+                    // 左右
+                    if (mode === 3 || mode === 4) {
+                        total += arr[i][(j - 1 + c) % c];
+                        total += arr[i][(j + 1) % c];
+                    } else {
+                        if (j > 0) total += arr[i][j - 1];
+                        if (j < c - 1) total += arr[i][j + 1];
+                    }
+
+                    newArr[i][j] = total % 2;
+                }
+            }
+            return { newArr, rOff, cOff };
+        }
+
+        // 計算 SHA1 雜湊
+        function arrayHash(arr) {
+            const str = arr.map(row => row.join('')).join('');
+            return CryptoJS.SHA1(str).toString();
+        }
+
+        // 檢查是否全空
+        function isArrayEmpty(arr) {
+            return !arr.some(row => row.some(cell => cell === 1));
+        }
+
+        // 渲染畫面 (自動適應縮放，完美對應 Matplotlib 視覺效果)
+        function render() {
+            const displayArray = historyArrays[currentViewIdx] || array;
+            const hRows = displayArray.length;
+            const hCols = displayArray.length > 0 ? displayArray[0].length : cols;
+
+            // 動態調整畫布大小，維持格子為正方形
+            const cellSize = Math.min(Math.floor(500 / hCols), Math.floor(500 / hRows), 30);
+            canvas.width = hCols * cellSize;
+            canvas.height = hRows * cellSize;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 畫細胞與格線
+            for (let i = 0; i < hRows; i++) {
+                for (let j = 0; j < hCols; j++) {
+                    ctx.fillStyle = displayArray[i][j] === 1 ? '#000000' : '#ffffff';
+                    ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+
+                    ctx.strokeStyle = '#lightgray';
+                    ctx.lineWidth = 0.5;
+                    ctx.strokeRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                }
+            }
+
+            // 更新狀態文字
+            if (isSettingMode) {
+                statusTitle.innerText = `[${ruleNames[ruleMode]}] 請點擊網格設定初始點，完成後按【空白鍵】開始`;
+            } else {
+                if (isTerminated && currentViewIdx === historyArrays.length - 1) {
+                    statusTitle.innerText = `第 ${currentViewIdx} 盤 (${terminationReason})`;
+                } else if (isPaused || isTerminated) {
+                    statusTitle.innerText = `第 ${currentViewIdx} 盤 (已暫停，可用 ← → 鍵前後查看)`;
+                } else {
+                    statusTitle.innerText = `第 ${currentViewIdx} 盤`;
+                }
+            }
+        }
+
+        // 遊戲主循環步進
+        function stepGame() {
+            if (isSettingMode || isPaused) return;
+
+            // 如果目前正在歷史檢視，先歸位到最新
+            if (currentViewIdx < roundNum) {
+                currentViewIdx++;
+                render();
+                return;
+            }
+
+            // 處理第 0 步
+            if (roundNum === 0 && historyArrays.length > 0) {
+                const hash = arrayHash(array);
+                seenPatterns[hash] = roundNum;
+                const result = updateArray(array, ruleMode);
+                array = result.newArr;
+                currentROffsetTotal += result.rOff;
+                currentCOffsetTotal += result.cOff;
+                roundNum = 1;
+            }
+
+            // 檢查全面歸零
+            if (isArrayEmpty(array)) {
+                historyArrays.push(JSON.parse(JSON.stringify(array)));
+                currentViewIdx = roundNum;
+                isTerminated = true;
+                terminationReason = "全面歸零 - 終止";
+                clearInterval(gameIntervalId);
+                render();
+                return;
+            }
+
+            // 檢查重複
+            const hash = arrayHash(array);
+            if (hash in seenPatterns) {
+                const prevRound = seenPatterns[hash];
+                historyArrays.push(JSON.parse(JSON.stringify(array)));
+                currentViewIdx = roundNum;
+                isTerminated = true;
+                terminationReason = `與第 ${prevRound} 盤重複 - 終止`;
+                clearInterval(gameIntervalId);
+                render();
+                return;
+            }
+
+            // 正常步進紀錄
+            seenPatterns[hash] = roundNum;
+            historyArrays.push(JSON.parse(JSON.stringify(array)));
+            currentViewIdx = roundNum;
+
+            render();
+
+            // 計算下一步
+            const result = updateArray(array, ruleMode);
+            array = result.newArr;
+            currentROffsetTotal += result.rOff;
+            currentCOffsetTotal += result.cOff;
+            roundNum++;
+        }
+
+        // 點擊網格事件
+        canvas.addEventListener('click', (e) => {
+            if (!isSettingMode) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const displayArray = array;
+            const hRows = displayArray.length;
+            const hCols = displayArray[0].length;
+            const cellSize = canvas.width / hCols;
+
+            const c = Math.floor(x / cellSize);
+            const r = Math.floor(y / cellSize);
+
+            if (r >= 0 && r < hRows && c >= 0 && c < hCols) {
+                array[r][c] = 1 - array[r][c];
+                render();
+            }
+        });
+
+        // 鍵盤事件監聽 (空白鍵、左右方向鍵)
+        window.addEventListener('keydown', (e) => {
+            if (document.getElementById('game-container').style.display !== 'block') return;
+
+            if (e.key === ' ') {
+                e.preventDefault(); // 防止網頁滾動
+                if (isTerminated) return;
+
+                if (isSettingMode) {
+                    isSettingMode = false;
+                    isPaused = false;
+                    historyArrays.push(JSON.parse(JSON.stringify(array)));
+                    currentViewIdx = 0;
+                    render();
+                    gameIntervalId = setInterval(stepGame, intervalSec * 1000);
+                } else {
+                    isPaused = !isPaused;
+                    render();
+                }
+            } else if (e.key === 'ArrowLeft') {
+                if (!isSettingMode && (isPaused || isTerminated)) {
+                    if (currentViewIdx > 0) {
+                        currentViewIdx--;
+                        render();
+                    }
+                }
+            } else if (e.key === 'ArrowRight') {
+                if (!isSettingMode && (isPaused || isTerminated)) {
+                    if (currentViewIdx < historyArrays.length - 1) {
+                        currentViewIdx++;
+                        render();
+                    } else if (!isTerminated) {
+                        // 手動往右鍵步進（如果沒終止且在最尾端）
+                        if (isArrayEmpty(array)) {
+                            historyArrays.push(JSON.parse(JSON.stringify(array)));
+                            currentViewIdx = roundNum;
+                            isTerminated = true;
+                            terminationReason = "全面歸零 - 終止";
+                            render();
+                        } else {
+                            const hash = arrayHash(array);
+                            if (hash in seenPatterns) {
+                                const prevRound = seenPatterns[hash];
+                                historyArrays.push(JSON.parse(JSON.stringify(array)));
+                                currentViewIdx = roundNum;
+                                isTerminated = true;
+                                terminationReason = `與第 ${prevRound} 盤重複 - 終止`;
+                                render();
+                            } else {
+                                seenPatterns[hash] = roundNum;
+                                historyArrays.push(JSON.parse(JSON.stringify(array)));
+                                currentViewIdx = roundNum;
+                                render();
+
+                                const result = updateArray(array, ruleMode);
+                                array = result.newArr;
+                                currentROffsetTotal += result.rOff;
+                                currentCOffsetTotal += result.cOff;
+                                roundNum++;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
