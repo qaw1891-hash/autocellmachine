@@ -197,7 +197,7 @@
         <div class="form-group">
             <label>1. 選擇邊界規則:</label>
             <select id="rule-mode">
-                <option value="1">1. 無邊界</option>
+                <option value="1">1. 無界</option>
                 <option value="2">2. 有界 - 1對邊界 - 不相接</option>
                 <option value="3">3. 有界 - 1對邊界 - 相接1對</option>
                 <option value="4">4. 有界 - 2對邊界 - 不相接</option>
@@ -297,7 +297,7 @@
         const paramNotice = document.getElementById('param-notice'); 
 
         const modeHelpTexts = {
-            1: `<strong>1. 無邊界</strong><br>沒有邊界。`,
+            1: `<strong>1. 無界</strong><br>沒有邊界。`,
             2: `<strong>2. 有界 - 1對邊界 - 不相接</strong><br>行／列固定，且不相接。`,
             3: `<strong>3. 有界 - 1對邊界 - 相接1對</strong><br>行／列固定，且相接。`,
             4: `<strong>4. 有界 - 2對邊界 - 不相接</strong><br>行、列固定，均不相接。`,
@@ -428,7 +428,7 @@
         const speedValDisplay = document.getElementById('speed-val');
 
         const ruleNames = {
-            1: "無邊界",
+            1: "無界",
             2: "有界 - 1對邊界 - 不相接",
             3: "有界 - 1對邊界 - 相接1對",
             4: "有界 - 2對邊界 - 不相接",
