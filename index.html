@@ -19,14 +19,15 @@
             -webkit-user-select: none;
             user-select: none;
             position: relative;
+            font-size: 20px; /* 全域基礎字體調大 1.25x (16px * 1.25) */
         }
         
         #setup-container { 
             background: white; 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            max-width: 500px; 
+            padding: 25px; /* 調整內邊距 */
+            border-radius: 10px; 
+            box-shadow: 0 5px 8px rgba(0,0,0,0.1); 
+            max-width: 580px; /* 配合字體調整容器寬度 */
             width: 100%; 
             text-align: center; 
             margin-top: 20px;
@@ -35,10 +36,10 @@
 
         #game-container { 
             background: white; 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            max-width: 1350px; 
+            padding: 25px; 
+            border-radius: 10px; 
+            box-shadow: 0 5px 8px rgba(0,0,0,0.1); 
+            max-width: 1450px; 
             width: 100%; 
             display: none; 
             flex-direction: row; 
@@ -49,10 +50,10 @@
         }
 
         .left-panel {
-            flex: 0 0 240px;
+            flex: 0 0 280px; /* 加寬左側面板以容納 1.25x 字體 */
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             text-align: left;
         }
 
@@ -70,41 +71,41 @@
         }
 
         .right-panel {
-            flex: 0 0 320px;
+            flex: 0 0 370px; /* 加寬右側面板以容納 1.25x 字體 */
             background-color: #f8f9fa;
-            border-radius: 6px;
-            padding: 15px;
+            border-radius: 8px;
+            padding: 20px;
             border: 1px solid #e9ecef;
             box-sizing: border-box;
             max-height: 521px;
             overflow-y: auto; 
         }
 
-        .form-group { margin-bottom: 15px; text-align: left; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; }
-        select, input[type="number"] { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 20px; } 
+        select, input[type="number"] { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; font-size: 18px; } 
         
         #sub-rule-group {
             background: #e9ecef;
-            padding: 12px;
-            border-radius: 4px;
-            border-left: 4px solid #007bff;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid #007bff;
         }
         .btn-group-container {
             display: flex;
-            gap: 8px;
-            margin-top: 5px;
+            gap: 10px;
+            margin-top: 8px;
         }
         .btn-group-label {
             flex: 1;
             text-align: center;
             background: #ffffff;
             border: 1px solid #ccc;
-            padding: 8px 5px;
-            border-radius: 4px;
+            padding: 10px 6px;
+            border-radius: 5px;
             cursor: pointer;
             font-weight: normal;
-            font-size: 14px;
+            font-size: 18px; /* 14px * 1.25 ≈ 18px */
             transition: all 0.2s;
         }
         .btn-group-label.active {
@@ -114,11 +115,11 @@
             font-weight: bold;
         }
 
-        button { background-color: #007bff; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 5px; }
+        button { background-color: #007bff; color: white; border: none; padding: 15px 25px; font-size: 20px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 8px; } 
         button:hover { background-color: #0056b3; }
         button:disabled { background-color: #cccccc; cursor: not-allowed; }
-        h2, h3 { margin-top: 0; color: #333; }
-        h3 { font-size: 16px; border-bottom: 2px solid #007bff; padding-bottom: 5px; margin-bottom: 10px; }
+        h2 { font-size: 30px; margin-top: 0; color: #333; } /* 24px * 1.25 = 30px */
+        h3 { font-size: 20px; border-bottom: 3px solid #007bff; padding-bottom: 6px; margin-bottom: 12px; margin-top: 0; color: #333; } 
         
         canvas { 
             background-color: #fff; 
@@ -130,15 +131,15 @@
         }
         
         #status-title { 
-            font-size: 16px; 
+            font-size: 20px; 
             font-weight: bold; 
             color: #0056b3; 
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             line-height: 1.4;
-            min-height: 65px; 
+            min-height: 82px; /* 配合文字高度等比例增加最小高度 */
         }
 
-        .btn-ctrl { width: 100%; padding: 10px 15px; font-size: 14px; margin: 0; }
+        .btn-ctrl { width: 100%; padding: 12px 18px; font-size: 18px; margin: 0; } 
         .btn-play { background-color: #28a745; }
         .btn-play:hover { background-color: #218838; }
         .btn-pause { background-color: #ffc107; color: #333; }
@@ -154,30 +155,30 @@
             display: flex; 
             align-items: center; 
             justify-content: space-between;
-            gap: 8px; 
+            gap: 10px; 
             background: #e9ecef; 
-            padding: 8px 12px; 
-            border-radius: 4px; 
-            font-size: 14px; 
+            padding: 10px 15px; 
+            border-radius: 5px; 
+            font-size: 18px; 
             font-weight: bold; 
             color: #495057; 
             box-sizing: border-box;
         }
-        .slider-container input[type="range"] { flex: 1; min-width: 80px; cursor: pointer; }
+        .slider-container input[type="range"] { flex: 1; min-width: 100px; cursor: pointer; height: 6px; }
 
-        .help-item { margin-bottom: 12px; font-size: 14px; color: #495057; line-height: 1.6; }
-        .help-item strong { color: #000; display: inline-block; margin-bottom: 2px; }
-        .help-item ul { margin: 3px 0 0 0; padding-left: 18px; color: #495057; }
+        .help-item { margin-bottom: 15px; font-size: 18px; color: #495057; line-height: 1.6; } 
+        .help-item strong { color: #000; display: inline-block; margin-bottom: 3px; }
+        .help-item ul { margin: 4px 0 0 0; padding-left: 22px; color: #495057; }
 
         .footer-credits {
             position: fixed;
             right: 15px;
             bottom: 10px;
-            font-size: 16px;
+            font-size: 20px; 
             color: #777;
             background-color: rgba(240, 242, 245, 0.8);
-            padding: 5px 10px;
-            border-radius: 3px;
+            padding: 6px 12px;
+            border-radius: 4px;
             z-index: 9999;
             pointer-events: none;
         }
@@ -222,18 +223,18 @@
         <div class="form-group">
             <label>2. 設定其餘參數:</label>
             <div style="margin-bottom: 8px;">
-                <span style="display:inline-block; width:100px;">列數 (Rows):</span>
-                <input type="number" id="rows-input" value="15" min="1" style="width:100px;">
+                <span style="display:inline-block; width:135px;">列數 (Rows):</span>
+                <input type="number" id="rows-input" value="15" min="1" style="width:110px; font-size:18px;">
             </div>
             <div style="margin-bottom: 8px;">
-                <span style="display:inline-block; width:100px;">行數 (Cols):</span>
-                <input type="number" id="cols-input" value="15" min="1" style="width:100px;">
+                <span style="display:inline-block; width:135px;">行數 (Cols):</span>
+                <input type="number" id="cols-input" value="15" min="1" style="width:110px; font-size:18px;">
             </div>
             <div style="margin-bottom: 8px;">
-                <span style="display:inline-block; width:100px;">更新間隔 (秒):</span>
-                <input type="number" id="interval-input" value="0.2" step="0.1" min="0.01" max="10" style="width:100px;">
+                <span style="display:inline-block; width:135px;">更新間隔 (秒):</span>
+                <input type="number" id="interval-input" value="0.2" step="0.1" min="0.01" max="10" style="width:110px; font-size:18px;">
             </div>
-            <div id="param-notice" style="color: #666; font-size: 13px; margin-top: 8px; line-height: 1.4; background: #fff3cd; border-left: 4px solid #ffc107; padding: 6px 10px; display: none;"></div>
+            <div id="param-notice" style="color: #666; font-size: 17px; margin-top: 8px; line-height: 1.4; background: #fff3cd; border-left: 4px solid #ffc107; padding: 6px 10px; display: none;"></div>
         </div>
         <button id="start-setup-btn">確定並開始設定初始格</button>
     </div>
@@ -346,13 +347,13 @@
             e.target.value = val;
         }
 
-        // 新增：更新間隔秒數的驗證（不可超過 10s）
+        // 更新間隔秒數的驗證
         function validateIntervalInput(e) {
             let val = parseFloat(e.target.value);
             if (isNaN(val) || val <= 0) {
                 val = 0.2; 
             } else if (val > 10) {
-                val = 10;  // 強制鎖定最高 10 秒
+                val = 10;  
             }
             e.target.value = val;
         }
@@ -362,7 +363,6 @@
         rowsInput.addEventListener('blur', validateInput);
         colsInput.addEventListener('blur', validateInput);
 
-        // 綁定更新時間的驗證
         intervalInput.addEventListener('change', validateIntervalInput);
         intervalInput.addEventListener('blur', validateIntervalInput);
 
@@ -531,7 +531,6 @@
             fixedDirection = checkedRadio ? checkedRadio.value : 'cols';
 
             intervalSec = parseFloat(intervalInput.value);
-            // 雙重保險：如果按下開始按鈕時數值異常，也做一次修正限制
             if (intervalSec > 10) intervalSec = 10;
             if (isNaN(intervalSec) || intervalSec <= 0) intervalSec = 0.2;
 
@@ -870,7 +869,7 @@
                 roundNum = nextRoundNum;
                 currentViewIdx = roundNum;
                 isTerminated = true;
-                terminationReason = `全面歸零 - 終止<br><span style="color:#6c757d; font-size:14px;">歸零盤次：第 ${nextRoundNum} 盤</span>`;
+                terminationReason = `全面歸零 - 終止<br><span style="color:#6c757d; font-size:18px;">歸零盤次：第 ${nextRoundNum} 盤</span>`;
                 clearInterval(gameIntervalId);
                 render();
                 updateButtonUI();
@@ -887,7 +886,7 @@
                 currentViewIdx = roundNum;
                 isTerminated = true;
                 const period = nextRoundNum - prevRound;
-                terminationReason = `與第 ${prevRound} 盤重複 - 終止<br><span style="color:#ff8c00; font-size:14px;">循環週期：${period} (${nextRoundNum} - ${prevRound})</span>`;
+                terminationReason = `與第 ${prevRound} 盤重複 - 終止<br><span style="color:#ff8c00; font-size:18px;">循環週期：${period} (${nextRoundNum} - ${prevRound})</span>`;
                 clearInterval(gameIntervalId);
                 render();
                 updateButtonUI();
