@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>細胞自動機</title>
+    <style>
+        body { 
+            font-family: "Microsoft JhengHei", sans-serif; 
+            background-color: #f0f2f5; 
+            margin: 0; 
+            padding: 10px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            position: relative;
+        }
+        
+        #setup-container { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            max-width: 500px; 
+            width: 100%; 
+            text-align: center; 
+            margin-top: 20px;
+            box-sizing: border-box; 
+        }
+
+        #game-container { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            max-width: 1350px; 
+            width: 100%; 
+            display: none; 
+            flex-direction: row; 
+            gap: 20px; 
+            align-items: flex-start; 
+            justify-content: center;
+            box-sizing: border-box; 
+        }
+
+        .left-panel {
+            flex: 0 0 240px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            text-align: left;
+        }
+
+        .center-panel {
+            flex: 0 0 521px;
+            width: 521px;
+            height: 521px;
+            border: 2px dashed #999;
+            background-color: #fafafa;
+            overflow: hidden; 
+            position: relative;
+            box-sizing: content-box;
+            touch-action: none; 
+        }
+
+        .right-panel {
+            flex: 0 0 320px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            border: 1px solid #e9ecef;
+            box-sizing: border-box;
+            max-height: 521px;
+            overflow-y: auto; 
+        }
+
+        .form-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        select, input[type="number"] { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        
+        #sub-rule-group {
+            background: #e9ecef;
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        .btn-group-container {
+            display: flex;
+            gap: 8px;
+            margin-top: 5px;
+        }
+        .btn-group-label {
+            flex: 1;
+            text-align: center;
+            background: #ffffff;
+            border: 1px solid #ccc;
+            padding: 8px 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: normal;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .btn-group-label.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+            font-weight: bold;
+        }
+
+        button { background-color: #007bff; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 5px; }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #cccccc; cursor: not-allowed; }
+        h2, h3 { margin-top: 0; color: #333; }
+        h3 { font-size: 16px; border-bottom: 2px solid #007bff; padding-bottom: 5px; margin-bottom: 10px; }
+        
+        canvas { 
+            background-color: #fff; 
+            cursor: pointer; 
+            display: block; 
+            position: absolute; 
+            left: 0;
+            top: 0;
+        }
+        
+        #status-title { 
+            font-size: 16px; 
+            font-weight: bold; 
+            color: #0056b3; 
+            margin-bottom: 5px;
+            line-height: 1.4;
+            min-height: 65px; 
+        }
+
+        .btn-ctrl { width: 100%; padding: 10px 15px; font-size: 14px; margin: 0; }
+        .btn-play { background-color: #28a745; }
+        .btn-play:hover { background-color: #218838; }
+        .btn-pause { background-color: #ffc107; color: #333; }
+        .btn-pause:hover { background-color: #e0a800; color: #333; }
+        .btn-step { background-color: #17a2b8; }
+        .btn-step:hover { background-color: #138496; }
+        .btn-danger { background-color: #dc3545; }
+        .btn-danger:hover { background-color: #c82333; }
+        .btn-secondary { background-color: #6c757d; }
+        .btn-secondary:hover { background-color: #5a6268; }
+
+        .slider-container { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            gap: 8px; 
+            background: #e9ecef; 
+            padding: 8px 12px; 
+            border-radius: 4px; 
+            font-size: 14px; 
+            font-weight: bold; 
+            color: #495057; 
+            box-sizing: border-box;
+        }
+        .slider-container input[type="range"] { flex: 1; min-width: 80px; cursor: pointer; }
+
+        .help-item { margin-bottom: 12px; font-size: 14px; color: #495057; line-height: 1.6; }
+        .help-item strong { color: #000; display: inline-block; margin-bottom: 2px; }
+        .help-item ul { margin: 3px 0 0 0; padding-left: 18px; color: #495057; }
+
+        .footer-credits {
+            position: fixed;
+            right: 15px;
+            bottom: 10px;
+            font-size: 16px;
+            color: #777;
+            background-color: rgba(240, 242, 245, 0.8);
+            padding: 5px 10px;
+            border-radius: 3px;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .input-hint {
+            display: none;
+            color: #dc3545;
+            font-size: 12px;
+            font-weight: normal;
+            margin-left: 5px;
+        }
+
+        @media (max-width: 1100px) {
+            #game-container { flex-direction: column; align-items: center; width: auto; }
+            .center-panel { width: 521px; height: 521px; }
+            .left-panel, .right-panel { flex: 1; width: 100%; max-width: 521px; max-height: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="setup-container">
+        <h2>細胞自動機 - 參數設定</h2>
+        <div class="form-group">
+            <label>1. 選擇邊界規則:</label>
+            <select id="rule-mode">
+                <option value="1">1. 無邊界</option>
+                <option value="2">2. 有界 - 1對邊界 - 不相接</option>
+                <option value="3">3. 有界 - 1對邊界 - 相接1對</option>
+                <option value="4">4. 有界 - 2對邊界 - 不相接</option>
+                <option value="5">5. 有界 - 2對邊界 - 相接1對</option>
+                <option value="6">6. 有界 - 2對邊界 - 相接2對</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="sub-rule-group" style="display: none;">
+            <label id="sub-rule-label">1-1. 設定進階選項:</label>
+            <div class="btn-group-container">
+                <label class="btn-group-label active" id="opt1-label">
+                    <input type="radio" name="sub-dir" id="opt1" value="cols" checked style="display:none;">
+                    <span id="opt1-text">選項一</span>
+                </label>
+                <label class="btn-group-label" id="opt2-label">
+                    <input type="radio" name="sub-dir" id="opt2" value="rows" style="display:none;">
+                    <span id="opt2-text">選項二</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>2. 設定其餘參數:</label>
+            <div style="margin-bottom: 8px;">
+                <span style="display:inline-block; width:100px;">列數 (Rows):</span>
+                <input type="number" id="rows-input" value="15" min="1" style="width:100px;">
+                <span id="rows-hint" class="input-hint">(只能輸入奇數，且兩者將自動同步綁定)</span>
+            </div>
+            <div style="margin-bottom: 8px;">
+                <span style="display:inline-block; width:100px;">行數 (Cols):</span>
+                <input type="number" id="cols-input" value="15" min="1" style="width:100px;">
+                <span id="cols-hint" class="input-hint">(只能輸入奇數，且兩者將自動同步綁定)</span>
+            </div>
+            <div style="margin-bottom: 8px;">
+                <span style="display:inline-block; width:100px;">更新間隔 (秒):</span>
+                <input type="number" id="interval-input" value="0.2" step="0.1" min="0.01" max="10" style="width:100px;">
+            </div>
+            <div id="param-notice" style="color: #666; font-size: 13px; margin-top: 8px; line-height: 1.4; background: #fff3cd; border-left: 4px solid #ffc107; padding: 6px 10px; display: none;"></div>
+        </div>
+        <button id="start-setup-btn">確定並開始設定初始格</button>
+    </div>
+
+    <div id="game-container">
+        <div class="left-panel">
+            <div id="status-title">請點擊網格設定初始點</div>
+            <button id="play-pause-btn" class="btn-ctrl btn-play">開始播放</button>
+            <button id="prev-btn" class="btn-ctrl btn-step" disabled>上一盤 (←)</button>
+            <button id="next-btn" class="btn-ctrl btn-step" disabled>下一盤 (→)</button>
+            
+            <div class="slider-container">
+                <span>間隔:</span>
+                <input type="range" id="dynamic-speed" min="0.01" max="10.0" step="0.01" value="0.2">
+                <span id="speed-val">0.20s</span>
+            </div>
+
+            <button id="clear-btn" class="btn-ctrl btn-danger">一鍵清空</button>
+            <button id="back-btn" class="btn-ctrl btn-secondary">重新設定</button>
+        </div>
+        
+        <div class="center-panel" id="canvas-container">
+            <canvas id="grid-canvas"></canvas>
+        </div>
+
+        <div class="right-panel">
+            <h3>目前邊界規則狀態</h3>
+            <div id="dynamic-mode-help" class="help-item"></div>
+
+            <h3>操作指南</h3>
+            <div class="help-item">
+                <strong>💻 執行操作：</strong>
+                <ul>
+                    <li>點擊網格可切換活/死細胞狀態。</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-credits">本程式使用Gemini生成，研究者僅提供想法。</div>
+
+    <script>
+        function arrayHash(arr) {
+            const str = arr.map(row => row.join('')).join('');
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = (hash << 5) - hash + char;
+                hash |= 0;
+            }
+            return hash.toString();
+        }
+
+        const ruleModeSelect = document.getElementById('rule-mode');
+        const rowsInput = document.getElementById('rows-input');
+        const colsInput = document.getElementById('cols-input');
+        const intervalInput = document.getElementById('interval-input');
+        const canvasContainer = document.getElementById('canvas-container');
+        const dynamicModeHelp = document.getElementById('dynamic-mode-help');
+        const paramNotice = document.getElementById('param-notice'); 
+        const rowsHint = document.getElementById('rows-hint');
+        const colsHint = document.getElementById('cols-hint');
+
+        const modeHelpTexts = {
+            1: `<strong>1. 無邊界</strong><br>四個方向皆不設限。網格隨細胞擴展增長，最外側活細胞與邊界永遠保持至少一格緩衝，方格大小動態縮小。`,
+            2: `<strong>2. 有界 - 1對邊界 - 不相接</strong><br>固定方向不變；延伸方向網格隨細胞動態向外增長，與外側活細胞保持緩衝。`,
+            3: `<strong>3. 有界 - 1對邊界 - 相接1對</strong><br>固定方向頭尾環狀相接；延伸方向隨細胞繁衍動態擴展並維持邊緣緩衝。`,
+            4: `<strong>4. 有界 - 2對邊界 - 不相接</strong><br>範圍完全固定，不會動態增長。`,
+            5: `<strong>5. 有界 - 2對邊界 - 相接1對</strong><br>網格範圍固定，左右或上下相接。`,
+            6: `<strong>6. 有界 - 2對邊界 - 相接2對</strong><br>網格範圍固定，上下相接且左右相接。`
+        };
+
+        function updateHelpPanel() {
+            const mode = ruleModeSelect.value;
+            let text = modeHelpTexts[mode];
+            const checkedRadio = document.querySelector('input[name="sub-dir"]:checked');
+            const currentDir = checkedRadio ? checkedRadio.value : 'cols';
+
+            if (mode === "2" || mode === "3") {
+                const dirText = currentDir === 'cols' ? '固定行（左右固定，上下無限延伸）' : '固定列（上下固定，左右無限延伸）';
+                text += `<br><span style="color:#ff8c00; font-weight:bold;">⚠️ 當前設定：${dirText}</span>`;
+            } else if (mode === "5") {
+                const dirText = currentDir === 'cols' ? '左右相接' : '上下相接';
+                text += `<br><span style="color:#ff8c00; font-weight:bold;">⚠️ 當前相接設定：${dirText}</span>`;
+            }
+            dynamicModeHelp.innerHTML = text;
+        }
+
+        function updateParamNotice() {
+            const val = ruleModeSelect.value;
+            const checkedRadio = document.querySelector('input[name="sub-dir"]:checked');
+            const currentDir = checkedRadio ? checkedRadio.value : 'cols';
+            
+            if (val === "1" || val === "2" || val === "3") {
+                let targetText = "";
+                if (val === "1") {
+                    targetText = "列數與行數";
+                } else {
+                    targetText = (currentDir === 'cols') ? "列數" : "行數";
+                }
+                paramNotice.innerHTML = `⚠️ 備註：選擇${targetText}僅決定初始可填範圍`;
+                paramNotice.style.display = "block";
+            } else {
+                paramNotice.style.display = "none";
+            }
+
+            // 拔除限制：不論任何模式，都不在輸入時強制跳出奇數/綁定提示
+            rowsHint.style.display = "none";
+            colsHint.style.display = "none";
+        }
+
+        function validateInput(e) {
+            let val = parseInt(e.target.value);
+            if (isNaN(val) || val <= 0) val = 1;
+            e.target.value = val;
+        }
+
+        // 基本防錯：確保輸入數值為正整數
+        rowsInput.addEventListener('change', validateInput);
+        colsInput.addEventListener('change', validateInput);
+        rowsInput.addEventListener('blur', validateInput);
+        colsInput.addEventListener('blur', validateInput);
+
+        ruleModeSelect.addEventListener('change', () => {
+            const val = ruleModeSelect.value;
+            const subGroup = document.getElementById('sub-rule-group');
+            const subLabel = document.getElementById('sub-rule-label');
+            const opt1Text = document.getElementById('opt1-text');
+            const opt2Text = document.getElementById('opt2-text');
+
+            if (val === "2" || val === "3") {
+                subGroup.style.display = "block";
+                subLabel.innerText = "1-1. 選擇固定方向 (二選一):";
+                opt1Text.innerText = "固定行 (左右固定)";
+                opt2Text.innerText = "固定列 (上下固定)";
+            } else if (val === "5") {
+                subGroup.style.display = "block";
+                subLabel.innerText = "1-1. 選擇相接方向 (二選一):";
+                opt1Text.innerText = "左右相接";
+                opt2Text.innerText = "上下相接";
+            } else {
+                subGroup.style.display = "none";
+            }
+
+            updateHelpPanel();
+            updateParamNotice();
+        });
+
+        document.querySelectorAll('input[name="sub-dir"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                document.querySelectorAll('.btn-group-label').forEach(lbl => lbl.classList.remove('active'));
+                if (radio.checked) {
+                    radio.parentElement.classList.add('active');
+                }
+                updateHelpPanel();
+                updateParamNotice();
+            });
+        });
+
+        let rows, cols, intervalSec, ruleMode, fixedDirection;
+        let array = [];
+        let historyArrays = [];
+        let seenPatterns = {};
+        let roundNum = 0;
+        let currentViewIdx = 0;
+
+        let isSettingMode = true;
+        let isPaused = true;
+        let isTerminated = false;
+        let terminationReason = "";
+        let gameIntervalId = null;
+
+        const canvas = document.getElementById('grid-canvas');
+        const ctx = canvas.getContext('2d');
+        const statusTitle = document.getElementById('status-title');
+
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        
+        const speedSlider = document.getElementById('dynamic-speed');
+        const speedValDisplay = document.getElementById('speed-val');
+
+        const ruleNames = {
+            1: "無邊界",
+            2: "有界 - 1對邊界 - 不相接",
+            3: "有界 - 1對邊界 - 相接1對",
+            4: "有界 - 2對邊界 - 不相接",
+            5: "有界 - 2對邊界 - 相接1對",
+            6: "有界 - 2對邊界 - 相接2對"
+        };
+
+        const maxContainerSize = 521; 
+        const basePadding = 15; 
+
+        function getGridGeometry(hRows, hCols) {
+            const usableSize = maxContainerSize - (basePadding * 2) - 1; 
+            
+            let snapW, snapH;
+
+            if (ruleMode === 1) {
+                const rawW = usableSize / hCols;
+                const rawH = usableSize / hRows;
+                const minRaw = Math.min(rawW, rawH);
+                snapW = Math.floor(minRaw * 100) / 100;
+                snapH = snapW;
+            } else if (ruleMode === 2 || ruleMode === 3) {
+                if (fixedDirection === 'cols') {
+                    const rawH = usableSize / hRows;
+                    snapH = Math.floor(rawH * 100) / 100;
+                    snapW = snapH; 
+                } else {
+                    const rawW = usableSize / hCols;
+                    snapW = Math.floor(rawW * 100) / 100;
+                    snapH = snapW; 
+                }
+            } else {
+                const rawW = usableSize / hCols;
+                const rawH = usableSize / hRows;
+                const minRaw = Math.min(rawW, rawH);
+                snapW = Math.floor(minRaw * 100) / 100;
+                snapH = snapW;
+            }
+
+            const xCoords = [];
+            for (let j = 0; j <= hCols; j++) {
+                xCoords.push(Math.round(j * snapW));
+            }
+            const yCoords = [];
+            for (let i = 0; i <= hRows; i++) {
+                yCoords.push(Math.round(i * snapH));
+            }
+
+            const actualW = xCoords[hCols] - xCoords[0];
+            const actualH = yCoords[hRows] - yCoords[0];
+
+            const offsetX = basePadding + Math.floor((maxContainerSize - (basePadding * 2) - actualW) / 2);
+            const offsetY = basePadding + Math.floor((maxContainerSize - (basePadding * 2) - actualH) / 2);
+
+            return { xCoords, yCoords, offsetX, offsetY };
+        }
+
+        function handleGridClick(mouseX, mouseY) {
+            const displayArray = historyArrays[currentViewIdx] || array;
+            const hRows = displayArray.length;
+            const hCols = displayArray[0].length;
+
+            const geo = getGridGeometry(hRows, hCols);
+
+            const targetX = mouseX - geo.offsetX;
+            const targetY = mouseY - geo.offsetY;
+
+            let clickCol = -1;
+            let clickRow = -1;
+
+            for (let j = 0; j < hCols; j++) {
+                if (targetX >= geo.xCoords[j] && targetX < geo.xCoords[j+1]) {
+                    clickCol = j;
+                    break;
+                }
+            }
+            for (let i = 0; i < hRows; i++) {
+                if (targetY >= geo.yCoords[i] && targetY < geo.yCoords[i+1]) {
+                    clickRow = i;
+                    break;
+                }
+            }
+
+            if (clickRow >= 0 && clickRow < array.length && clickCol >= 0 && clickCol < array[0].length) {
+                array[clickRow][clickCol] = 1 - array[clickRow][clickCol];
+                render();
+            }
+        }
+
+        canvasContainer.addEventListener('pointerdown', (e) => {
+            if (!isSettingMode || e.button !== 0) return;
+            const rect = canvasContainer.getBoundingClientRect();
+            handleGridClick(e.clientX - rect.left, e.clientY - rect.top);
+        });
+
+        document.getElementById('start-setup-btn').addEventListener('click', () => {
+            ruleMode = parseInt(ruleModeSelect.value);
+            
+            const checkedRadio = document.querySelector('input[name="sub-dir"]:checked');
+            fixedDirection = checkedRadio ? checkedRadio.value : 'cols';
+
+            intervalSec = parseFloat(intervalInput.value);
+            rows = parseInt(rowsInput.value);
+            cols = parseInt(colsInput.value);
+
+            if (isNaN(rows) || rows <= 0 || isNaN(cols) || cols <= 0 || isNaN(intervalSec) || intervalSec <= 0) {
+                alert("請輸入正確的數值！");
+                return;
+            }
+
+            // 僅在「非模式1（有界模式）」下保持自動鎖定為奇數正方形的設定
+            if (ruleMode !== 1) {
+                let targetSize = Math.max(rows, cols);
+                if (targetSize % 2 === 0) {
+                    targetSize += 1; 
+                }
+                if (rows !== targetSize || cols !== targetSize) {
+                    alert(`系統已自動將有界網格調整為最接近的奇數正方形：${targetSize}x${targetSize}`);
+                }
+                rows = targetSize;
+                cols = targetSize;
+                rowsInput.value = targetSize;
+                colsInput.value = targetSize;
+            }
+
+            speedSlider.value = intervalSec;
+            speedValDisplay.innerText = `${intervalSec.toFixed(2)}s`;
+
+            array = Array(rows).fill().map(() => Array(cols).fill(0));
+            historyArrays = [];
+            seenPatterns = {};
+            roundNum = 0;
+            currentViewIdx = 0;
+            isSettingMode = true;
+            isPaused = true;
+            isTerminated = false;
+            terminationReason = "";
+            if (gameIntervalId) clearInterval(gameIntervalId);
+
+            document.getElementById('setup-container').style.display = 'none';
+            document.getElementById('game-container').style.display = 'flex';
+
+            updateHelpPanel(); 
+            canvas.width = maxContainerSize;
+            canvas.height = maxContainerSize;
+            updateButtonUI();
+            render();
+        });
+
+        document.getElementById('back-btn').addEventListener('click', () => {
+            if (gameIntervalId) clearInterval(gameIntervalId);
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('setup-container').style.display = 'block';
+        });
+
+        clearBtn.addEventListener('click', () => {
+            if (!isSettingMode) return;
+            array = Array(rows).fill().map(() => Array(cols).fill(0));
+            render();
+        });
+
+        playPauseBtn.addEventListener('click', handlePlayPause);
+        prevBtn.addEventListener('click', handlePrevFrame);
+        nextBtn.addEventListener('click', handleNextFrame);
+
+        speedSlider.addEventListener('input', () => {
+            intervalSec = parseFloat(speedSlider.value);
+            speedValDisplay.innerText = `${intervalSec.toFixed(2)}s`;
+            if (!isSettingMode && !isPaused && !isTerminated) {
+                clearInterval(gameIntervalId);
+                gameIntervalId = setInterval(stepGame, intervalSec * 1000);
+            }
+        });
+
+        function handlePlayPause() {
+            if (isSettingMode) {
+                isSettingMode = false;
+                isPaused = false;
+                historyArrays.push(JSON.parse(JSON.stringify(array)));
+                seenPatterns[arrayHash(array)] = 0;
+                currentViewIdx = 0;
+                roundNum = 0;
+                gameIntervalId = setInterval(stepGame, intervalSec * 1000);
+            } else {
+                if (currentViewIdx < historyArrays.length - 1) {
+                    array = JSON.parse(JSON.stringify(historyArrays[currentViewIdx]));
+                    roundNum = currentViewIdx; 
+
+                    seenPatterns = {};
+                    for (let i = 0; i <= currentViewIdx; i++) {
+                        seenPatterns[arrayHash(historyArrays[i])] = i;
+                    }
+
+                    isTerminated = false;
+                    terminationReason = "";
+                    isPaused = false;
+                    
+                    clearInterval(gameIntervalId);
+                    gameIntervalId = setInterval(stepGame, intervalSec * 1000);
+                } else {
+                    if (isTerminated) return; 
+
+                    isPaused = !isPaused;
+                    if (!isPaused) {
+                        gameIntervalId = setInterval(stepGame, intervalSec * 1000);
+                    } else {
+                        clearInterval(gameIntervalId);
+                    }
+                }
+            }
+            render();
+            updateButtonUI();
+        }
+
+        function handlePrevFrame() {
+            if (!isSettingMode && (isPaused || isTerminated)) {
+                if (currentViewIdx > 0) {
+                    currentViewIdx--;
+                    render(); 
+                    updateButtonUI();
+                }
+            }
+        }
+
+        function handleNextFrame() {
+            if (!isSettingMode && (isPaused || isTerminated)) {
+                if (currentViewIdx < historyArrays.length - 1) {
+                    currentViewIdx++;
+                    render(); 
+                    updateButtonUI();
+                } else {
+                    isTerminated = false;
+                    terminationReason = "";
+                    array = JSON.parse(JSON.stringify(historyArrays[currentViewIdx]));
+                    roundNum = currentViewIdx;
+
+                    seenPatterns = {};
+                    for (let i = 0; i <= currentViewIdx; i++) {
+                        seenPatterns[arrayHash(historyArrays[i])] = i;
+                    }
+
+                    stepGame();
+                    updateButtonUI();
+                }
+            }
+        }
+
+        function updateButtonUI() {
+            if (isSettingMode) {
+                clearBtn.style.visibility = "visible";
+                playPauseBtn.innerText = "開始播放";
+                playPauseBtn.className = "btn-ctrl btn-play";
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+            } else {
+                clearBtn.style.visibility = "hidden";
+                const isViewingHistory = currentViewIdx < historyArrays.length - 1;
+
+                if (isViewingHistory || isPaused) {
+                    playPauseBtn.innerText = "繼續播放";
+                    playPauseBtn.className = "btn-ctrl btn-play";
+                } else if (isTerminated) {
+                    playPauseBtn.innerText = "已終止";
+                    playPauseBtn.className = "btn-ctrl btn-secondary";
+                } else {
+                    playPauseBtn.innerText = "暫停播放";
+                    playPauseBtn.className = "btn-ctrl btn-pause";
+                }
+
+                prevBtn.disabled = (currentViewIdx === 0);
+                nextBtn.disabled = false;
+            }
+        }
+
+        function padArrayEdges(arr, mode) {
+            if (mode === 4 || mode === 5 || mode === 6) {
+                return { arr, isExpanded: false };
+            }
+
+            const r = arr.length;
+            const c = arr[0].length;
+            
+            let allowTopBottom = true;
+            let allowLeftRight = true;
+
+            if (mode === 2 || mode === 3) {
+                if (fixedDirection === 'cols') {
+                    allowLeftRight = false; 
+                } else {
+                    allowTopBottom = false; 
+                }
+            }
+
+            const needTop = allowTopBottom && arr[0].some(v => v === 1);
+            const needBottom = allowTopBottom && arr[r-1].some(v => v === 1);
+            const needLeft = allowLeftRight && arr.some(row => row[0] === 1);
+            const needRight = allowLeftRight && arr.some(row => row[c-1] === 1);
+
+            if (!(needTop || needBottom || needLeft || needRight)) {
+                return { arr, isExpanded: false };
+            }
+
+            let padT = 0, padB = 0, padL = 0, padR = 0;
+            
+            if (mode === 1) {
+                padT = 1; padB = 1; padL = 1; padR = 1;
+            } else {
+                if (allowTopBottom) { padT = 1; padB = 1; }
+                if (allowLeftRight) { padL = 1; padR = 1; }
+            }
+
+            const newRows = r + padT + padB;
+            const newCols = c + padL + padR;
+            const newArr = Array(newRows).fill().map(() => Array(newCols).fill(0));
+
+            for (let i = 0; i < r; i++) {
+                for (let j = 0; j < c; j++) {
+                    newArr[i + padT][j + padL] = arr[i][j];
+                }
+            }
+            
+            return { arr: newArr, isExpanded: true };
+        }
+
+        function updateArray(arr, mode) {
+            const padResult = padArrayEdges(arr, mode);
+            arr = padResult.arr;
+
+            const r = arr.length;
+            const c = arr[0].length;
+            const newArr = Array(r).fill().map(() => Array(c).fill(0));
+
+            for (let i = 0; i < r; i++) {
+                for (let j = 0; j < c; j++) {
+                    let total = 0;
+                    
+                    const isWrapTopBottom = (mode === 6) || (mode === 5 && fixedDirection === 'rows') || (mode === 3 && fixedDirection === 'rows');
+                    const isWrapLeftRight = (mode === 6) || (mode === 5 && fixedDirection === 'cols') || (mode === 3 && fixedDirection === 'cols');
+
+                    if (i > 0) {
+                        total += arr[i - 1][j];
+                    } else if (isWrapTopBottom) {
+                        total += arr[r - 1][j];
+                    }
+
+                    if (i < r - 1) {
+                        total += arr[i + 1][j];
+                    } else if (isWrapTopBottom) {
+                        total += arr[0][j];
+                    }
+
+                    if (j > 0) {
+                        total += arr[i][j - 1];
+                    } else if (isWrapLeftRight) {
+                        total += arr[i][c - 1];
+                    }
+
+                    if (j < c - 1) {
+                        total += arr[i][j + 1];
+                    } else if (isWrapLeftRight) {
+                        total += arr[i][0];
+                    }
+                    
+                    newArr[i][j] = total % 2;
+                }
+            }
+
+            return { newArr, isExpanded: padResult.isExpanded };
+        }
+
+        function isArrayEmpty(arr) {
+            return !arr.some(row => row.some(cell => cell === 1));
+        }
+
+        function render() {
+            const displayArray = historyArrays[currentViewIdx] || array;
+            const hRows = displayArray.length;
+            const hCols = displayArray[0].length;
+
+            ctx.clearRect(0, 0, maxContainerSize, maxContainerSize);
+
+            const geo = getGridGeometry(hRows, hCols);
+
+            for (let i = 0; i < hRows; i++) {
+                for (let j = 0; j < hCols; j++) {
+                    ctx.fillStyle = displayArray[i][j] === 1 ? '#000000' : '#ffffff';
+                    
+                    const x1 = geo.offsetX + geo.xCoords[j];
+                    const x2 = geo.offsetX + geo.xCoords[j+1];
+                    const y1 = geo.offsetY + geo.yCoords[i];
+                    const y2 = geo.offsetY + geo.yCoords[i+1];
+                    
+                    ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+                }
+            }
+
+            ctx.strokeStyle = '#d0d0d0'; 
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            
+            const startLineX = geo.offsetX + geo.xCoords[0] + 0.5;
+            const endLineX = geo.offsetX + geo.xCoords[hCols] + 0.5;
+            const startLineY = geo.offsetY + geo.yCoords[0] + 0.5;
+            const endLineY = geo.offsetY + geo.yCoords[hRows] + 0.5;
+
+            for (let j = 0; j <= hCols; j++) {
+                const x = geo.offsetX + geo.xCoords[j] + 0.5;
+                ctx.moveTo(x, startLineY);
+                ctx.lineTo(x, endLineY);
+            }
+            for (let i = 0; i <= hRows; i++) {
+                const y = geo.offsetY + geo.yCoords[i] + 0.5;
+                ctx.moveTo(startLineX, y);
+                ctx.lineTo(endLineX, y);
+            }
+            ctx.stroke();
+
+            const isDynamicSize = (ruleMode === 1 || ruleMode === 2 || ruleMode === 3);
+            let modeDetail = ruleNames[ruleMode];
+            if (ruleMode === 2 || ruleMode === 3) {
+                modeDetail += ` (${fixedDirection === 'cols' ? '固定行' : '固定列'})`;
+            } else if (ruleMode === 5) {
+                modeDetail += ` (${fixedDirection === 'cols' ? '左右相接' : '上下相接'})`;
+            }
+            const sizeInfo = isDynamicSize ? `<br>(網格: ${hCols}x${hRows})` : '';
+
+            if (isSettingMode) {
+                statusTitle.innerHTML = `[${modeDetail}]<br>請點擊網格設定初始點${sizeInfo}`;
+            } else {
+                if (isTerminated && currentViewIdx === historyArrays.length - 1) {
+                    statusTitle.innerHTML = `第 ${currentViewIdx} 盤${sizeInfo}<br><span style="color:red;">${terminationReason}</span>`;
+                } else if (isPaused || currentViewIdx < historyArrays.length - 1) {
+                    statusTitle.innerHTML = `第 ${currentViewIdx} 盤${sizeInfo}<br>(已暫停)`;
+                } else {
+                    statusTitle.innerHTML = `第 ${currentViewIdx} 盤${sizeInfo}`;
+                }
+            }
+        }
+
+        function stepGame() {
+            const result = updateArray(array, ruleMode);
+            let nextArray = result.newArr;
+            
+            const nextRoundNum = roundNum + 1;
+
+            if (isArrayEmpty(nextArray)) {
+                historyArrays = historyArrays.slice(0, roundNum + 1);
+                historyArrays.push(JSON.parse(JSON.stringify(nextArray)));
+                array = nextArray;
+                roundNum = nextRoundNum;
+                currentViewIdx = roundNum;
+                isTerminated = true;
+                terminationReason = `全面歸零 - 終止<br><span style="color:#6c757d; font-size:14px;">歸零盤次：第 ${nextRoundNum} 盤</span>`;
+                clearInterval(gameIntervalId);
+                render();
+                updateButtonUI();
+                return;
+            }
+
+            const nextHash = arrayHash(nextArray);
+            if (nextHash in seenPatterns) {
+                const prevRound = seenPatterns[nextHash];
+                historyArrays = historyArrays.slice(0, roundNum + 1);
+                historyArrays.push(JSON.parse(JSON.stringify(nextArray)));
+                array = nextArray;
+                roundNum = nextRoundNum;
+                currentViewIdx = roundNum;
+                isTerminated = true;
+                const period = nextRoundNum - prevRound;
+                terminationReason = `與第 ${prevRound} 盤重複 - 終止<br><span style="color:#ff8c00; font-size:14px;">循環週期：${period} (${nextRoundNum} - ${prevRound})</span>`;
+                clearInterval(gameIntervalId);
+                render();
+                updateButtonUI();
+                return;
+            }
+
+            seenPatterns[nextHash] = nextRoundNum;
+            historyArrays = historyArrays.slice(0, roundNum + 1);
+            historyArrays.push(JSON.parse(JSON.stringify(nextArray)));
+
+            array = nextArray;
+            roundNum = nextRoundNum;
+            currentViewIdx = roundNum;
+
+            render();
+            updateButtonUI();
+        }
+
+        // 初始化第一次檢查與提示字串顯示
+        updateParamNotice();
+
+        window.addEventListener('keydown', (e) => {
+            if (document.getElementById('game-container').style.display !== 'flex') return;
+            if (e.key === ' ') {
+                e.preventDefault(); 
+                handlePlayPause();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault(); 
+                handlePrevFrame();
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault(); 
+                handleNextFrame();
+            }
+        });
+    </script>
+</body>
+</html>
