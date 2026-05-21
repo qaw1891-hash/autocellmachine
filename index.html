@@ -339,50 +339,32 @@
             if (val === "1" || val === "2" || val === "3") {
                 let targetText = "";
                 if (val === "1") {
-                    targetText = "列數/行數";
+                    targetText = "列數與行數";
                 } else {
                     targetText = (currentDir === 'cols') ? "列數" : "行數";
                 }
-                paramNotice.innerHTML = `⚠️ 備註：選擇${targetText}僅在選擇初始可填範圍`;
+                paramNotice.innerHTML = `⚠️ 備註：選擇${targetText}僅決定初始可填範圍`;
                 paramNotice.style.display = "block";
             } else {
                 paramNotice.style.display = "none";
             }
 
-            // 控制提示字串隱現
-            if (val === "1") {
-                rowsHint.style.display = "inline";
-                colsHint.style.display = "inline";
-            } else {
-                rowsHint.style.display = "none";
-                colsHint.style.display = "none";
-            }
+            // 拔除限制：不論任何模式，都不在輸入時強制跳出奇數/綁定提示
+            rowsHint.style.display = "none";
+            colsHint.style.display = "none";
         }
 
-        function handleDimensionSync(e) {
-            if (ruleModeSelect.value !== "1") return;
-            
+        function validateInput(e) {
             let val = parseInt(e.target.value);
             if (isNaN(val) || val <= 0) val = 1;
-            
-            if (val % 2 === 0) {
-                val += 1;
-            }
-            
-            rowsInput.value = val;
-            colsInput.value = val;
+            e.target.value = val;
         }
 
-        rowsInput.addEventListener('input', (e) => {
-            if (ruleModeSelect.value === "1") colsInput.value = e.target.value;
-        });
-        colsInput.addEventListener('input', (e) => {
-            if (ruleModeSelect.value === "1") rowsInput.value = e.target.value;
-        });
-        rowsInput.addEventListener('change', handleDimensionSync);
-        colsInput.addEventListener('change', handleDimensionSync);
-        rowsInput.addEventListener('blur', handleDimensionSync);
-        colsInput.addEventListener('blur', handleDimensionSync);
+        // 基本防錯：確保輸入數值為正整數
+        rowsInput.addEventListener('change', validateInput);
+        colsInput.addEventListener('change', validateInput);
+        rowsInput.addEventListener('blur', validateInput);
+        colsInput.addEventListener('blur', validateInput);
 
         ruleModeSelect.addEventListener('change', () => {
             const val = ruleModeSelect.value;
@@ -403,13 +385,6 @@
                 opt2Text.innerText = "上下相接";
             } else {
                 subGroup.style.display = "none";
-            }
-
-            if (val === "1") {
-                let currentVal = parseInt(rowsInput.value) || 15;
-                if (currentVal % 2 === 0) currentVal += 1;
-                rowsInput.value = currentVal;
-                colsInput.value = currentVal;
             }
 
             updateHelpPanel();
@@ -564,13 +539,14 @@
                 return;
             }
 
+            // 僅在「非模式1（有界模式）」下保持自動鎖定為奇數正方形的設定
             if (ruleMode !== 1) {
                 let targetSize = Math.max(rows, cols);
                 if (targetSize % 2 === 0) {
                     targetSize += 1; 
                 }
                 if (rows !== targetSize || cols !== targetSize) {
-                    alert(`系統已自動將網格調整為最接近的奇數正方形：${targetSize}x${targetSize}`);
+                    alert(`系統已自動將有界網格調整為最接近的奇數正方形：${targetSize}x${targetSize}`);
                 }
                 rows = targetSize;
                 cols = targetSize;
