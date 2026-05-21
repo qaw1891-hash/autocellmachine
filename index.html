@@ -339,9 +339,21 @@
             }
         }
 
+        // 行數與列數的驗證
         function validateInput(e) {
             let val = parseInt(e.target.value);
             if (isNaN(val) || val <= 0) val = 1;
+            e.target.value = val;
+        }
+
+        // 新增：更新間隔秒數的驗證（不可超過 10s）
+        function validateIntervalInput(e) {
+            let val = parseFloat(e.target.value);
+            if (isNaN(val) || val <= 0) {
+                val = 0.2; 
+            } else if (val > 10) {
+                val = 10;  // 強制鎖定最高 10 秒
+            }
             e.target.value = val;
         }
 
@@ -349,6 +361,10 @@
         colsInput.addEventListener('change', validateInput);
         rowsInput.addEventListener('blur', validateInput);
         colsInput.addEventListener('blur', validateInput);
+
+        // 綁定更新時間的驗證
+        intervalInput.addEventListener('change', validateIntervalInput);
+        intervalInput.addEventListener('blur', validateIntervalInput);
 
         ruleModeSelect.addEventListener('change', () => {
             const val = ruleModeSelect.value;
@@ -515,10 +531,14 @@
             fixedDirection = checkedRadio ? checkedRadio.value : 'cols';
 
             intervalSec = parseFloat(intervalInput.value);
+            // 雙重保險：如果按下開始按鈕時數值異常，也做一次修正限制
+            if (intervalSec > 10) intervalSec = 10;
+            if (isNaN(intervalSec) || intervalSec <= 0) intervalSec = 0.2;
+
             rows = parseInt(rowsInput.value);
             cols = parseInt(colsInput.value);
 
-            if (isNaN(rows) || rows <= 0 || isNaN(cols) || cols <= 0 || isNaN(intervalSec) || intervalSec <= 0) {
+            if (isNaN(rows) || rows <= 0 || isNaN(cols) || cols <= 0) {
                 alert("請輸入正確的數值！");
                 return;
             }
@@ -649,13 +669,13 @@
 
         function updateButtonUI() {
             if (isSettingMode) {
-                clearBtn.style.display = "block"; // 顯示一鍵清空
+                clearBtn.style.display = "block"; 
                 playPauseBtn.innerText = "開始播放";
                 playPauseBtn.className = "btn-ctrl btn-play";
                 prevBtn.disabled = true;
                 nextBtn.disabled = true;
             } else {
-                clearBtn.style.display = "none"; // 播放時隱藏一鍵清空（不留空白位置）
+                clearBtn.style.display = "none"; 
                 const isViewingHistory = currentViewIdx < historyArrays.length - 1;
 
                 if (isViewingHistory || isPaused) {
