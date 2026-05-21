@@ -251,8 +251,8 @@
                 <span id="speed-val">0.20s</span>
             </div>
 
-            <button id="clear-btn" class="btn-ctrl btn-danger">一鍵清空</button>
             <button id="back-btn" class="btn-ctrl btn-secondary">重新設定</button>
+            <button id="clear-btn" class="btn-ctrl btn-danger">一鍵清空</button>
         </div>
         
         <div class="center-panel" id="canvas-container">
@@ -649,13 +649,13 @@
 
         function updateButtonUI() {
             if (isSettingMode) {
-                clearBtn.style.visibility = "visible";
+                clearBtn.style.display = "block"; // 顯示一鍵清空
                 playPauseBtn.innerText = "開始播放";
                 playPauseBtn.className = "btn-ctrl btn-play";
                 prevBtn.disabled = true;
                 nextBtn.disabled = true;
             } else {
-                clearBtn.style.visibility = "hidden";
+                clearBtn.style.display = "none"; // 播放時隱藏一鍵清空（不留空白位置）
                 const isViewingHistory = currentViewIdx < historyArrays.length - 1;
 
                 if (isViewingHistory || isPaused) {
