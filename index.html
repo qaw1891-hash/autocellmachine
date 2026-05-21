@@ -236,12 +236,12 @@
             </div>
             <div id="param-notice" style="color: #666; font-size: 17px; margin-top: 8px; line-height: 1.4; background: #fff3cd; border-left: 4px solid #ffc107; padding: 6px 10px; display: none;"></div>
         </div>
-        <button id="start-setup-btn">確定並開始設定初始格</button>
+        <button id="start-setup-btn">確定並開始設定首盤</button>
     </div>
 
     <div id="game-container">
         <div class="left-panel">
-            <div id="status-title">請點擊網格設定初始點</div>
+            <div id="status-title">請點擊方格設定首盤</div>
             <button id="play-pause-btn" class="btn-ctrl btn-play">開始播放</button>
             <button id="prev-btn" class="btn-ctrl btn-step" disabled>上一盤 (←)</button>
             <button id="next-btn" class="btn-ctrl btn-step" disabled>下一盤 (→)</button>
@@ -333,7 +333,7 @@
                 } else {
                     targetText = (currentDir === 'cols') ? "列數" : "行數";
                 }
-                paramNotice.innerHTML = `⚠️ 備註：選擇${targetText}僅決定初始可填範圍`;
+                paramNotice.innerHTML = `⚠️ 備註：選擇${targetText}僅決定首盤範圍`;
                 paramNotice.style.display = "block";
             } else {
                 paramNotice.style.display = "none";
@@ -845,7 +845,7 @@
             const sizeInfo = isDynamicSize ? `<br>(網格: ${hCols}x${hRows})` : '';
 
             if (isSettingMode) {
-                statusTitle.innerHTML = `[${modeDetail}]<br>請點擊網格設定初始點${sizeInfo}`;
+                statusTitle.innerHTML = `[${modeDetail}]<br>請點擊方格設定首盤${sizeInfo}`;
             } else {
                 if (isTerminated && currentViewIdx === historyArrays.length - 1) {
                     statusTitle.innerHTML = `第 ${currentViewIdx} 盤${sizeInfo}<br><span style="color:red;">${terminationReason}</span>`;
@@ -869,7 +869,7 @@
                 roundNum = nextRoundNum;
                 currentViewIdx = roundNum;
                 isTerminated = true;
-                terminationReason = `全面歸零 - 終止<br><span style="color:#6c757d; font-size:18px;">歸零盤次：第 ${nextRoundNum} 盤</span>`;
+                terminationReason = `歸零 - 終止<br><span style="color:#6c757d; font-size:18px;">歸零盤次：第 ${nextRoundNum} 盤</span>`;
                 clearInterval(gameIntervalId);
                 render();
                 updateButtonUI();
