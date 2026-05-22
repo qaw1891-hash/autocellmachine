@@ -520,29 +520,13 @@
             
             let snapW, snapH;
 
-            if (ruleMode === 1) {
-                const rawW = usableSize / hCols;
-                const rawH = usableSize / hRows;
-                const minRaw = Math.min(rawW, rawH);
-                snapW = Math.floor(minRaw * 100) / 100;
-                snapH = snapW;
-            } else if (ruleMode === 2 || ruleMode === 3) {
-                if (fixedDirection === 'cols') {
-                    const rawH = usableSize / hRows;
-                    snapH = Math.floor(rawH * 100) / 100;
-                    snapW = snapH; 
-                } else {
-                    const rawW = usableSize / hCols;
-                    snapW = Math.floor(rawW * 100) / 100;
-                    snapH = snapW; 
-                }
-            } else {
-                const rawW = usableSize / hCols;
-                const rawH = usableSize / hRows;
-                const minRaw = Math.min(rawW, rawH);
-                snapW = Math.floor(minRaw * 100) / 100;
-                snapH = snapW;
-            }
+            // 修正處：將原本分開的寬高邏輯統一起來，確保不論在何種邊界模式下，
+            // 只要長寬比例不等（如列數>行數 或 行數>列數），都能取最小極限比例，不溢出外框。
+            const rawW = usableSize / hCols;
+            const rawH = usableSize / hRows;
+            const minRaw = Math.min(rawW, rawH);
+            snapW = Math.floor(minRaw * 100) / 100;
+            snapH = snapW;
 
             const xCoords = [];
             for (let j = 0; j <= hCols; j++) {
