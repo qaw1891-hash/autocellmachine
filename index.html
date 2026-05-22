@@ -236,7 +236,7 @@
             margin-right: 8px;
         }
 
-        @media (orientation: portrait) {
+        @media (orientation: portrait) or (max-height: 550px) {
             #game-container { 
                 flex-direction: column; 
                 align-items: center; 
@@ -346,7 +346,7 @@
             <div class="help-item">
                 <strong>💻 執行操作：</strong>
                 <ul>
-                    <li>點擊方格可切換黑白格狀態。</li>
+                    <li>點擊方格可切換黑白格狀態，但開始播放後不得再次切換黑白格狀態。</li>
                 </ul>
             </div>
         </div>
@@ -426,8 +426,8 @@
 
         function validateIntervalInput(e) {
             let val = parseFloat(e.target.value);
-            if (isNaN(val) || val <= 0) {
-                val = 0.2; 
+            if (isNaN(val) || val < 0.01) {
+                val = 0.01; 
             } else if (val > 10) {
                 val = 10;  
             }
@@ -679,7 +679,9 @@
                 isSettingMode = false;
                 isPaused = false;
                 historyArrays.push(JSON.parse(JSON.stringify(array)));
-                seenPatterns[arrayHash(array)] = 0;
+                if (ruleMode !== 1 && ruleMode !== 2 && ruleMode !== 3) {
+                    seenPatterns[arrayHash(array)] = 0;
+                }
                 currentViewIdx = 0;
                 roundNum = 0;
                 gameIntervalId = setInterval(stepGame, intervalSec * 1000);
@@ -689,8 +691,10 @@
                     roundNum = currentViewIdx; 
 
                     seenPatterns = {};
-                    for (let i = 0; i <= currentViewIdx; i++) {
-                        seenPatterns[arrayHash(historyArrays[i])] = i;
+                    if (ruleMode !== 1 && ruleMode !== 2 && ruleMode !== 3) {
+                        for (let i = 0; i <= currentViewIdx; i++) {
+                            seenPatterns[arrayHash(historyArrays[i])] = i;
+                        }
                     }
 
                     isTerminated = false;
@@ -737,8 +741,10 @@
                     roundNum = currentViewIdx;
 
                     seenPatterns = {};
-                    for (let i = 0; i <= currentViewIdx; i++) {
-                        seenPatterns[arrayHash(historyArrays[i])] = i;
+                    if (ruleMode !== 1 && ruleMode !== 2 && ruleMode !== 3) {
+                        for (let i = 0; i <= currentViewIdx; i++) {
+                            seenPatterns[arrayHash(historyArrays[i])] = i;
+                        }
                     }
 
                     stepGame();
@@ -978,38 +984,41 @@
             
             const nextRoundNum = roundNum + 1;
 
-            if (isArrayEmpty(nextArray)) {
-                historyArrays = historyArrays.slice(0, roundNum + 1);
-                historyArrays.push(JSON.parse(JSON.stringify(nextArray)));
-                array = nextArray;
-                roundNum = nextRoundNum;
-                currentViewIdx = roundNum;
-                isTerminated = true;
-                terminationReason = `歸零 - 終止<br><span style="color:#6c757d; font-size:19.8px;">歸零盤次：第 ${nextRoundNum} 盤</span>`;
-                clearInterval(gameIntervalId);
-                render();
-                updateButtonUI();
-                return;
+            if (ruleMode !== 1 && ruleMode !== 2 && ruleMode !== 3) {
+                if (isArrayEmpty(nextArray)) {
+                    historyArrays = historyArrays.slice(0, roundNum + 1);
+                    historyArrays.push(JSON.parse(JSON.stringify(nextArray)));
+                    array = nextArray;
+                    roundNum = nextRoundNum;
+                    currentViewIdx = roundNum;
+                    isTerminated = true;
+                    terminationReason = `歸零 - 終止<br><span style="color:#6c757d; font-size:19.8px;">歸零盤次：第 ${nextRoundNum} 盤</span>`;
+                    clearInterval(gameIntervalId);
+                    render();
+                    updateButtonUI();
+                    return;
+                }
+
+                const nextHash = arrayHash(nextArray);
+                if (nextHash in seenPatterns) {
+                    const prevRound = seenPatterns[nextHash];
+                    historyArrays = historyArrays.slice(0, roundNum + 1);
+                    historyArrays.push(JSON.parse(JSON.stringify(nextArray)));
+                    array = nextArray;
+                    roundNum = nextRoundNum;
+                    currentViewIdx = roundNum;
+                    isTerminated = true;
+                    const period = nextRoundNum - prevRound;
+                    terminationReason = `與第 ${prevRound} 盤重複 - 終止<br><span style="color:#ff8c00; font-size:19.8px;">循環週期：${period} (${nextRoundNum} - ${prevRound})</span>`;
+                    clearInterval(gameIntervalId);
+                    render();
+                    updateButtonUI();
+                    return;
+                }
+
+                seenPatterns[nextHash] = nextRoundNum;
             }
 
-            const nextHash = arrayHash(nextArray);
-            if (nextHash in seenPatterns) {
-                const prevRound = seenPatterns[nextHash];
-                historyArrays = historyArrays.slice(0, roundNum + 1);
-                historyArrays.push(JSON.parse(JSON.stringify(nextArray)));
-                array = nextArray;
-                roundNum = nextRoundNum;
-                currentViewIdx = roundNum;
-                isTerminated = true;
-                const period = nextRoundNum - prevRound;
-                terminationReason = `與第 ${prevRound} 盤重複 - 終止<br><span style="color:#ff8c00; font-size:19.8px;">循環週期：${period} (${nextRoundNum} - ${prevRound})</span>`;
-                clearInterval(gameIntervalId);
-                render();
-                updateButtonUI();
-                return;
-            }
-
-            seenPatterns[nextHash] = nextRoundNum;
             historyArrays = historyArrays.slice(0, roundNum + 1);
             historyArrays.push(JSON.parse(JSON.stringify(nextArray)));
 
