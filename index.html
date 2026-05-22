@@ -9,7 +9,7 @@
             font-family: "Microsoft JhengHei", sans-serif; 
             background-color: #f0f2f5; 
             margin: 0; 
-            padding: 10px; 
+            padding: 15px; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
@@ -19,15 +19,15 @@
             -webkit-user-select: none;
             user-select: none;
             position: relative;
-            font-size: 20px; /* 全域基礎字體調大 1.25x (16px * 1.25) */
+            font-size: 20px; 
         }
         
         #setup-container { 
             background: white; 
-            padding: 25px; /* 調整內邊距 */
+            padding: 25px; 
             border-radius: 10px; 
             box-shadow: 0 5px 8px rgba(0,0,0,0.1); 
-            max-width: 580px; /* 配合字體調整容器寬度 */
+            max-width: 580px; 
             width: 100%; 
             text-align: center; 
             margin-top: 20px;
@@ -39,18 +39,21 @@
             padding: 25px; 
             border-radius: 10px; 
             box-shadow: 0 5px 8px rgba(0,0,0,0.1); 
-            max-width: 1450px; 
-            width: 100%; 
+            width: 95vw; 
+            max-width: 1600px;
+            height: 85vh;
+            max-height: 90vh;
             display: none; 
             flex-direction: row; 
             gap: 20px; 
-            align-items: flex-start; 
+            align-items: center; 
             justify-content: center;
             box-sizing: border-box; 
         }
 
         .left-panel {
-            flex: 0 0 280px; /* 加寬左側面板以容納 1.25x 字體 */
+            flex: 1 1 250px; 
+            max-width: 320px;
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -58,9 +61,10 @@
         }
 
         .center-panel {
-            flex: 0 0 521px;
-            width: 100%;
-            max-width: 521px;
+            flex: 0 0 auto; 
+            width: 70vh; 
+            max-width: 42vw; 
+            max-height: 70vh;
             aspect-ratio: 1 / 1;
             border: 2px dashed #999;
             background-color: #fafafa;
@@ -71,13 +75,15 @@
         }
 
         .right-panel {
-            flex: 0 0 370px; /* 加寬右側面板以容納 1.25x 字體 */
+            flex: 1 1 300px; 
+            max-width: 400px;
+            height: 100%;
+            max-height: 75vh;
             background-color: #f8f9fa;
             border-radius: 8px;
             padding: 20px;
             border: 1px solid #e9ecef;
             box-sizing: border-box;
-            max-height: 521px;
             overflow-y: auto; 
         }
 
@@ -86,39 +92,69 @@
         select, input[type="number"] { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; font-size: 18px; } 
         
         #sub-rule-group {
-            background: #e9ecef;
-            padding: 15px;
-            border-radius: 5px;
-            border-left: 5px solid #007bff;
+            background: transparent;
+            padding: 0;
+            border-left: none;
+            margin-top: -8px; 
         }
+
         .btn-group-container {
             display: flex;
-            gap: 10px;
-            margin-top: 8px;
+            flex-direction: row; 
+            gap: 20px;          
+            margin-top: 4px;
         }
         .btn-group-label {
-            flex: 1;
-            text-align: center;
-            background: #ffffff;
-            border: 1px solid #ccc;
-            padding: 10px 6px;
-            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
             cursor: pointer;
+            font-size: 18px;    
+            color: #495057;
             font-weight: normal;
-            font-size: 18px; /* 14px * 1.25 ≈ 18px */
-            transition: all 0.2s;
+            transition: color 0.15s;
+            padding: 4px 0;
+        }
+        .btn-group-label:hover {
+            color: #000;
+        }
+        .btn-group-label input[type="radio"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px; 
+            height: 18px;
+            border: 2px solid #adb5bd;
+            border-radius: 50%;
+            outline: none;
+            margin: 0;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            background-color: #fff;
+        }
+        .btn-group-label input[type="radio"]:checked {
+            border-color: #007bff;
+        }
+        .btn-group-label input[type="radio"]:checked::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 9px;
+            height: 9px;
+            background-color: #007bff;
+            border-radius: 50%;
         }
         .btn-group-label.active {
-            background: #007bff;
-            color: white;
-            border-color: #007bff;
+            color: #000;
             font-weight: bold;
         }
 
         button { background-color: #007bff; color: white; border: none; padding: 15px 25px; font-size: 20px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 8px; } 
         button:hover { background-color: #0056b3; }
         button:disabled { background-color: #cccccc; cursor: not-allowed; }
-        h2 { font-size: 30px; margin-top: 0; color: #333; } /* 24px * 1.25 = 30px */
+        h2 { font-size: 30px; margin-top: 0; color: #333; } 
         h3 { font-size: 20px; border-bottom: 3px solid #007bff; padding-bottom: 6px; margin-bottom: 12px; margin-top: 0; color: #333; } 
         
         canvas { 
@@ -136,7 +172,7 @@
             color: #0056b3; 
             margin-bottom: 8px;
             line-height: 1.4;
-            min-height: 82px; /* 配合文字高度等比例增加最小高度 */
+            min-height: 82px; 
         }
 
         .btn-ctrl { width: 100%; padding: 12px 18px; font-size: 18px; margin: 0; } 
@@ -183,10 +219,30 @@
             pointer-events: none;
         }
 
-        @media (max-width: 1100px) {
-            #game-container { flex-direction: column; align-items: center; width: auto; }
-            .center-panel { flex: none; width: 100%; max-width: 521px; height: auto; aspect-ratio: 1 / 1; }
-            .left-panel, .right-panel { flex: 1; width: 100%; max-width: 521px; max-height: none; }
+        @media (orientation: portrait) {
+            #game-container { 
+                flex-direction: column; 
+                align-items: center; 
+                width: 95vw; 
+                max-width: 600px;
+                max-height: none;
+                height: auto;
+                padding: 15px;
+            }
+            .center-panel { 
+                flex: none; 
+                width: 100%; 
+                max-width: 100%; 
+                max-height: none;
+                height: auto; 
+                aspect-ratio: 1 / 1; 
+            }
+            .left-panel, .right-panel { 
+                flex: none; 
+                width: 100%; 
+                max-width: 100%; 
+                max-height: none; 
+            }
         }
     </style>
 </head>
@@ -207,15 +263,15 @@
         </div>
 
         <div class="form-group" id="sub-rule-group" style="display: none;">
-            <label id="sub-rule-label">1-1. 設定進階選項:</label>
+            <label id="sub-rule-label" style="font-size: 18px; margin-bottom: 4px;">1-1. 選擇固定方向 (二選一):</label>
             <div class="btn-group-container">
                 <label class="btn-group-label active" id="opt1-label">
-                    <input type="radio" name="sub-dir" id="opt1" value="cols" checked style="display:none;">
-                    <span id="opt1-text">選項一</span>
+                    <input type="radio" name="sub-dir" id="opt1" value="cols" checked>
+                    <span id="opt1-text">固定行 (左右固定)</span>
                 </label>
                 <label class="btn-group-label" id="opt2-label">
-                    <input type="radio" name="sub-dir" id="opt2" value="rows" style="display:none;">
-                    <span id="opt2-text">選項二</span>
+                    <input type="radio" name="sub-dir" id="opt2" value="rows">
+                    <span id="opt2-text">固定列 (上下固定)</span>
                 </label>
             </div>
         </div>
@@ -340,14 +396,12 @@
             }
         }
 
-        // 行數與列數的驗證
         function validateInput(e) {
             let val = parseInt(e.target.value);
             if (isNaN(val) || val <= 0) val = 1;
             e.target.value = val;
         }
 
-        // 更新間隔秒數的驗證
         function validateIntervalInput(e) {
             let val = parseFloat(e.target.value);
             if (isNaN(val) || val <= 0) {
@@ -437,10 +491,10 @@
         };
 
         let currentContainerSize = 521; 
-        const basePadding = 15; 
 
         function getGridGeometry(hRows, hCols) {
-            const usableSize = currentContainerSize - (basePadding * 2) - 1; 
+            const dynamicPadding = Math.max(6, Math.floor(currentContainerSize * 0.025)); 
+            const usableSize = currentContainerSize - (dynamicPadding * 2) - 1; 
             
             let snapW, snapH;
 
@@ -480,8 +534,8 @@
             const actualW = xCoords[hCols] - xCoords[0];
             const actualH = yCoords[hRows] - yCoords[0];
 
-            const offsetX = basePadding + Math.floor((currentContainerSize - (basePadding * 2) - actualW) / 2);
-            const offsetY = basePadding + Math.floor((currentContainerSize - (basePadding * 2) - actualH) / 2);
+            const offsetX = dynamicPadding + Math.floor((currentContainerSize - (dynamicPadding * 2) - actualW) / 2);
+            const offsetY = dynamicPadding + Math.floor((currentContainerSize - (dynamicPadding * 2) - actualH) / 2);
 
             return { xCoords, yCoords, offsetX, offsetY };
         }
@@ -518,11 +572,20 @@
             }
         }
 
-        canvasContainer.addEventListener('pointerdown', (e) => {
+        canvas.addEventListener('pointerdown', (e) => {
             if (!isSettingMode || e.button !== 0) return;
-            const rect = canvasContainer.getBoundingClientRect();
+            const rect = canvas.getBoundingClientRect();
             handleGridClick(e.clientX - rect.left, e.clientY - rect.top);
         });
+
+        function resizeCanvas() {
+            if (document.getElementById('game-container').style.display === 'flex') {
+                currentContainerSize = Math.min(canvasContainer.clientWidth, canvasContainer.clientHeight) || 521;
+                canvas.width = currentContainerSize;
+                canvas.height = currentContainerSize;
+                render();
+            }
+        }
 
         document.getElementById('start-setup-btn').addEventListener('click', () => {
             ruleMode = parseInt(ruleModeSelect.value);
@@ -559,13 +622,9 @@
             document.getElementById('setup-container').style.display = 'none';
             document.getElementById('game-container').style.display = 'flex';
 
-            currentContainerSize = canvasContainer.clientWidth || 521;
-
+            resizeCanvas();
             updateHelpPanel(); 
-            canvas.width = currentContainerSize;
-            canvas.height = currentContainerSize;
             updateButtonUI();
-            render();
         });
 
         document.getElementById('back-btn').addEventListener('click', () => {
@@ -794,6 +853,8 @@
 
         function render() {
             const displayArray = historyArrays[currentViewIdx] || array;
+            if (!displayArray || displayArray.length === 0) return;
+
             const hRows = displayArray.length;
             const hCols = displayArray[0].length;
 
@@ -801,6 +862,7 @@
 
             const geo = getGridGeometry(hRows, hCols);
 
+            // 1. 繪製方格填色 (黑或白)
             for (let i = 0; i < hRows; i++) {
                 for (let j = 0; j < hCols; j++) {
                     ctx.fillStyle = displayArray[i][j] === 1 ? '#000000' : '#ffffff';
@@ -814,8 +876,9 @@
                 }
             }
 
+            // 2. 繪製內部的基礎格線 (細灰色)
             ctx.strokeStyle = '#d0d0d0'; 
-            ctx.lineWidth = 1;
+            ctx.lineWidth = 1; // 基礎線段寬度為 1
             ctx.beginPath();
             
             const startLineX = geo.offsetX + geo.xCoords[0] + 0.5;
@@ -835,6 +898,48 @@
             }
             ctx.stroke();
 
+            // 3. 判斷目前的相接規則狀態並繪製高亮邊框
+            const hasLeftRightWrap = (ruleMode === 6) || (ruleMode === 5 && fixedDirection === 'cols') || (ruleMode === 3 && fixedDirection === 'cols');
+            const hasTopBottomWrap = (ruleMode === 6) || (ruleMode === 5 && fixedDirection === 'rows') || (ruleMode === 3 && fixedDirection === 'rows');
+
+            /* 【關鍵修改】依原黑色線段(1)的 1.25 倍動態設定線段寬度 */
+            ctx.lineWidth = 1.25; 
+
+            // 繪製左右相接的紅線 (最左邊線、最右邊線)
+            if (hasLeftRightWrap) {
+                ctx.strokeStyle = '#dc3545'; // 紅色
+                
+                // 最左邊線 (從左上到左下)
+                ctx.beginPath();
+                ctx.moveTo(geo.offsetX + geo.xCoords[0], geo.offsetY + geo.yCoords[0]);
+                ctx.lineTo(geo.offsetX + geo.xCoords[0], geo.offsetY + geo.yCoords[hRows]);
+                ctx.stroke();
+
+                // 最右邊線 (從右上到右下)
+                ctx.beginPath();
+                ctx.moveTo(geo.offsetX + geo.xCoords[hCols], geo.offsetY + geo.yCoords[0]);
+                ctx.lineTo(geo.offsetX + geo.xCoords[hCols], geo.offsetY + geo.yCoords[hRows]);
+                ctx.stroke();
+            }
+
+            // 繪製上下相接的藍線 (最上邊線、最下邊線)
+            if (hasTopBottomWrap) {
+                ctx.strokeStyle = '#007bff'; // 藍色
+                
+                // 最上邊線 (從左上到右上)
+                ctx.beginPath();
+                ctx.moveTo(geo.offsetX + geo.xCoords[0], geo.offsetY + geo.yCoords[0]);
+                ctx.lineTo(geo.offsetX + geo.xCoords[hCols], geo.offsetY + geo.yCoords[0]);
+                ctx.stroke();
+
+                // 最下邊線 (從左下到右下)
+                ctx.beginPath();
+                ctx.moveTo(geo.offsetX + geo.xCoords[0], geo.offsetY + geo.yCoords[hRows]);
+                ctx.lineTo(geo.offsetX + geo.xCoords[hCols], geo.offsetY + geo.yCoords[hRows]);
+                ctx.stroke();
+            }
+
+            // 4. 更新狀態標題文字
             const isDynamicSize = (ruleMode === 1 || ruleMode === 2 || ruleMode === 3);
             let modeDetail = ruleNames[ruleMode];
             if (ruleMode === 2 || ruleMode === 3) {
@@ -907,14 +1012,7 @@
 
         updateParamNotice();
 
-        window.addEventListener('resize', () => {
-            if (document.getElementById('game-container').style.display === 'flex') {
-                currentContainerSize = canvasContainer.clientWidth || 521;
-                canvas.width = currentContainerSize;
-                canvas.height = currentContainerSize;
-                render();
-            }
-        });
+        window.addEventListener('resize', resizeCanvas);
 
         window.addEventListener('keydown', (e) => {
             if (document.getElementById('game-container').style.display !== 'flex') return;
