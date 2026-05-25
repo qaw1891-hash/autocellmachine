@@ -5,235 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>四面八「方」．「格」物致知—探討塗色方格的規律</title>
     <style>
-        body { 
-            font-family: "Microsoft JhengHei", sans-serif; 
-            background-color: #f0f2f5; 
-            margin: 0; 
-            padding: 15px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            min-height: 100vh;
-            box-sizing: border-box;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
-            position: relative;
-            font-size: 22px; 
-        }
-        
-        #setup-container { 
-            display: flex;
-            flex-direction: row;
-            gap: 20px;
-            max-width: 1050px; 
-            width: 100%; 
-            margin-top: 20px;
-            box-sizing: border-box; 
-            align-items: flex-start;
-            justify-content: center;
-        }
-
-        .setup-panel {
-            background: white; 
-            padding: 25px; 
-            border-radius: 10px; 
-            box-shadow: 0 5px 8px rgba(0,0,0,0.1); 
-            box-sizing: border-box;
-        }
-
-        .setup-left {
-            max-width: 610px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .setup-right {
-            max-width: 420px;
-            width: 100%;
-            text-align: left;
-        }
-
-        #game-container { 
-            background: white; 
-            padding: 25px; 
-            border-radius: 10px; 
-            box-shadow: 0 5px 8px rgba(0,0,0,0.1); 
-            width: 95vw; 
-            max-width: 1600px;
-            height: 85vh;
-            max-height: 90vh;
-            display: none; 
-            flex-direction: row; 
-            gap: 20px; 
-            align-items: center; 
-            justify-content: center;
-            box-sizing: border-box; 
-        }
-
-        .left-panel {
-            flex: 1 1 250px; 
-            max-width: 340px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            text-align: left;
-        }
-
-        .center-panel {
-            flex: 0 0 auto; 
-            width: 70vh; 
-            max-width: 42vw; 
-            max-height: 70vh;
-            aspect-ratio: 1 / 1;
-            border: 2px dashed #999;
-            background-color: #fafafa;
-            overflow: hidden; 
-            position: relative;
-            box-sizing: border-box;
-            touch-action: none; 
-        }
-
-        .right-panel {
-            flex: 1 1 300px; 
-            max-width: 430px;
-            height: 100%;
-            max-height: 75vh;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 20px;
-            border: 1px solid #e9ecef;
-            box-sizing: border-box;
-            overflow-y: auto; 
-        }
-
+        /* 樣式完全保留，未作任何刪減以確保 UI 100% 相同 */
+        body { font-family: "Microsoft JhengHei", sans-serif; background-color: #f0f2f5; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; box-sizing: border-box; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; position: relative; font-size: 22px; }
+        #setup-container { display: flex; flex-direction: row; gap: 20px; max-width: 1050px; width: 100%; margin-top: 20px; box-sizing: border-box; align-items: flex-start; justify-content: center; }
+        .setup-panel { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 5px 8px rgba(0,0,0,0.1); box-sizing: border-box; }
+        .setup-left { max-width: 610px; width: 100%; text-align: center; }
+        .setup-right { max-width: 420px; width: 100%; text-align: left; }
+        #game-container { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 5px 8px rgba(0,0,0,0.1); width: 95vw; max-width: 1600px; height: 85vh; max-height: 90vh; display: none; flex-direction: row; gap: 20px; align-items: center; justify-content: center; box-sizing: border-box; }
+        .left-panel { flex: 1 1 250px; max-width: 340px; display: flex; flex-direction: column; gap: 12px; text-align: left; }
+        .center-panel { flex: 0 0 auto; width: 70vh; max-width: 42vw; max-height: 70vh; aspect-ratio: 1 / 1; border: 2px dashed #999; background-color: #fafafa; overflow: hidden; position: relative; box-sizing: border-box; touch-action: none; }
+        .right-panel { flex: 1 1 300px; max-width: 430px; height: 100%; max-height: 75vh; background-color: #f8f9fa; border-radius: 8px; padding: 20px; border: 1px solid #e9ecef; box-sizing: border-box; overflow-y: auto; }
         .form-group { margin-bottom: 20px; text-align: left; }
         label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 22px; } 
         select, input[type="number"] { width: 100%; padding: 11px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; font-size: 19.8px; } 
-        
-        #sub-rule-group {
-            background: transparent;
-            padding: 0;
-            border-left: none;
-            margin-top: -8px; 
-        }
-
-        .btn-group-container {
-            display: flex;
-            flex-direction: row; 
-            gap: 20px;          
-            margin-top: 4px;
-        }
-        .btn-group-label {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            cursor: pointer;
-            font-size: 19.8px;    
-            color: #495057;
-            font-weight: normal;
-            transition: color 0.15s;
-            padding: 4px 0;
-        }
-        .btn-group-label:hover {
-            color: #000;
-        }
-        .btn-group-label input[type="radio"] {
-            appearance: none;
-            -webkit-appearance: none;
-            width: 19px; 
-            height: 19px;
-            border: 2px solid #adb5bd;
-            border-radius: 50%;
-            outline: none;
-            margin: 0;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.15s ease-in-out;
-            background-color: #fff;
-        }
-        .btn-group-label input[type="radio"]:checked {
-            border-color: #007bff;
-        }
-        .btn-group-label input[type="radio"]:checked::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 9px;
-            height: 9px;
-            background-color: #007bff;
-            border-radius: 50%;
-        }
-        .btn-group-label.active {
-            color: #000;
-            font-weight: bold;
-        }
-
+        #sub-rule-group { background: transparent; padding: 0; border-left: none; margin-top: -8px; }
+        .btn-group-container { display: flex; flex-direction: row; gap: 20px; margin-top: 4px; }
+        .btn-group-label { display: flex; align-items: center; gap: 7px; cursor: pointer; font-size: 19.8px; color: #495057; font-weight: normal; transition: color 0.15s; padding: 4px 0; }
+        .btn-group-label:hover { color: #000; }
+        .btn-group-label input[type="radio"] { appearance: none; -webkit-appearance: none; width: 19px; height: 19px; border: 2px solid #adb5bd; border-radius: 50%; outline: none; margin: 0; position: relative; cursor: pointer; transition: all 0.15s ease-in-out; background-color: #fff; }
+        .btn-group-label input[type="radio"]:checked { border-color: #007bff; }
+        .btn-group-label input[type="radio"]:checked::before { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 9px; height: 9px; background-color: #007bff; border-radius: 50%; }
+        .btn-group-label.active { color: #000; font-weight: bold; }
         button { background-color: #007bff; color: white; border: none; padding: 14px 24px; font-size: 22px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 8px; } 
         button:hover { background-color: #0056b3; }
         button:disabled { background-color: #cccccc; cursor: not-allowed; }
-        
-        .btn-template {
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            padding: 12px 18px;
-            font-size: 19.8px;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            text-align: left;
-            margin-top: 0;
-            transition: background-color 0.15s;
-        }
-        .btn-template:hover {
-            background-color: #495057;
-        }
-
-        summary {
-            font-size: 22px;
-            font-weight: bold;
-            cursor: pointer;
-            padding: 12px;
-            background: #e9ecef;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            user-select: none;
-        }
-
-        .template-list-container {
-            max-height: 280px; 
-            overflow-y: auto; 
-            padding-right: 5px;
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-            margin-top: 5px;
-        }
-
+        .btn-template { background-color: #6c757d; color: white; border: none; padding: 12px 18px; font-size: 19.8px; border-radius: 5px; cursor: pointer; width: 100%; text-align: left; margin-top: 0; transition: background-color 0.15s; }
+        .btn-template:hover { background-color: #495057; }
+        summary { font-size: 22px; font-weight: bold; cursor: pointer; padding: 12px; background: #e9ecef; border-radius: 5px; margin-bottom: 10px; user-select: none; }
+        .template-list-container { max-height: 280px; overflow-y: auto; padding-right: 5px; display: flex; flex-direction: column; gap: 10px; margin-top: 5px; }
         h2 { font-size: 33px; margin-top: 0; color: #333; } 
         h3 { font-size: 22px; border-bottom: 3px solid #007bff; padding-bottom: 6px; margin-bottom: 12px; margin-top: 0; color: #333; } 
-        
-        canvas { 
-            background-color: #fff; 
-            cursor: pointer; 
-            display: block; 
-            position: absolute; 
-            left: 0;
-            top: 0;
-        }
-        
-        #status-title { 
-            font-size: 22px; 
-            font-weight: bold; 
-            color: #0056b3; 
-            margin-bottom: 8px;
-            line-height: 1.4;
-            min-height: 90px; 
-        }
-
+        canvas { background-color: #fff; cursor: pointer; display: block; position: absolute; left: 0; top: 0; }
+        #status-title { font-size: 22px; font-weight: bold; color: #0056b3; margin-bottom: 8px; line-height: 1.4; min-height: 90px; }
         .btn-ctrl { width: 100%; padding: 11px 17px; font-size: 19.8px; margin: 0; } 
         .btn-play { background-color: #28a745; }
         .btn-play:hover { background-color: #218838; }
@@ -245,86 +48,21 @@
         .btn-danger:hover { background-color: #c82333; }
         .btn-secondary { background-color: #6c757d; }
         .btn-secondary:hover { background-color: #5a6268; }
-
-        .slider-container { 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between;
-            gap: 10px; 
-            background: #e9ecef; 
-            padding: 10px 15px; 
-            border-radius: 5px; 
-            font-size: 19.8px; 
-            font-weight: bold; 
-            color: #495057; 
-            box-sizing: border-box;
-        }
+        .slider-container { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #e9ecef; padding: 10px 15px; border-radius: 5px; font-size: 19.8px; font-weight: bold; color: #495057; box-sizing: border-box; }
         .slider-container input[type="range"] { flex: 1; min-width: 100px; cursor: pointer; height: 6px; }
-
         .help-item { margin-bottom: 15px; font-size: 19.8px; color: #495057; line-height: 1.6; } 
         .help-item strong { color: #000; display: inline-block; margin-bottom: 3px; }
         .help-item ul { margin: 4px 0 0 0; padding-left: 24px; color: #495057; }
-
-        .footer-credits {
-            position: fixed;
-            right: 15px;
-            bottom: 10px;
-            font-size: 17.6px; 
-            color: #777;
-            background-color: rgba(240, 242, 245, 0.8);
-            padding: 6px 12px;
-            border-radius: 4px;
-            z-index: 9999;
-            pointer-events: none;
-        }
-
-        .grid-inputs-row {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-        .grid-inputs-row > div {
-            flex: 1;
-            display: flex;
-            align-items: center;
-        }
-        .grid-inputs-row span {
-            white-space: nowrap;
-            margin-right: 8px;
-        }
-
+        .footer-credits { position: fixed; right: 15px; bottom: 10px; font-size: 17.6px; color: #777; background-color: rgba(240, 242, 245, 0.8); padding: 6px 12px; border-radius: 4px; z-index: 9999; pointer-events: none; }
+        .grid-inputs-row { display: flex; gap: 15px; margin-bottom: 10px; }
+        .grid-inputs-row > div { flex: 1; display: flex; align-items: center; }
+        .grid-inputs-row span { white-space: nowrap; margin-right: 8px; }
         @media (orientation: portrait) or (max-height: 550px) {
-            #setup-container { 
-                flex-direction: column; 
-                align-items: center; 
-            }
-            .setup-left, .setup-right {
-                max-width: 600px;
-                width: 100%;
-            }
-            #game-container { 
-                flex-direction: column; 
-                align-items: center; 
-                width: 95vw; 
-                max-width: 600px;
-                max-height: none;
-                height: auto;
-                padding: 15px;
-            }
-            .center-panel { 
-                flex: none; 
-                width: 100%; 
-                max-width: 100%; 
-                max-height: none;
-                height: auto; 
-                aspect-ratio: 1 / 1; 
-            }
-            .left-panel, .right-panel { 
-                flex: none; 
-                width: 100%; 
-                max-width: 100%; 
-                max-height: none; 
-            }
+            #setup-container { flex-direction: column; align-items: center; }
+            .setup-left, .setup-right { max-width: 600px; width: 100%; }
+            #game-container { flex-direction: column; align-items: center; width: 95vw; max-width: 600px; max-height: none; height: auto; padding: 15px; }
+            .center-panel { flex: none; width: 100%; max-width: 100%; max-height: none; height: auto; aspect-ratio: 1 / 1; }
+            .left-panel, .right-panel { flex: none; width: 100%; max-width: 100%; max-height: none; }
         }
     </style>
 </head>
@@ -439,16 +177,14 @@
     <div class="footer-credits">本程式使用Gemini生成，研究者僅提供想法。</div>
 
     <script>
-        function arrayHash(arr) {
-            const str = arr.map(row => row.join('')).join('');
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                const char = str.charCodeAt(i);
-                hash = (hash << 5) - hash + char;
-                hash |= 0;
-            }
-            return hash.toString();
-        }
+        // 【優化 1】極速二維陣列深拷貝函數，效能遠超 JSON.parse(JSON.stringify)
+        const cloneGrid = arr => arr.map(row => [...row]);
+        
+        // 【優化 2】取代舊版容易碰撞的 arrayHash，採用絕對精準且快速的字串 Key
+        const getGridKey = arr => arr.map(row => row.join('')).join('');
+
+        // 【優化 3】快速建立填滿 0 的二維陣列
+        const createEmptyGrid = (r, c) => Array.from({ length: r }, () => new Array(c).fill(0));
 
         const ruleModeSelect = document.getElementById('rule-mode');
         const rowsInput = document.getElementById('rows-input');
@@ -468,14 +204,8 @@
         };
 
         const templateNames = {
-            1: "最大值、最小值觀察模式",
-            2: "定理3(1)",
-            3: "定理3(2)",
-            4: "定理3(3)",
-            5: "定理4(1)",
-            6: "定理4(2)",
-            7: "定理4(3)",
-            8: "定理5"
+            1: "最大值、最小值觀察模式", 2: "定理3(1)", 3: "定理3(2)", 4: "定理3(3)",
+            5: "定理4(1)", 6: "定理4(2)", 7: "定理4(3)", 8: "定理5"
         };
 
         let specialStatusText = "";
@@ -498,20 +228,13 @@
             if (isFromTemplate) {
                 const currentTplName = templateNames[currentTemplateId] || `模板 ${currentTemplateId}`;
                 let modeDetail = ruleNames[ruleMode];
-                if (ruleMode === 2 || ruleMode === 3) {
-                    modeDetail += ` (${fixedDirection === 'cols' ? '固定行' : '固定列'})`;
-                } else if (ruleMode === 5) {
-                    modeDetail += ` (${fixedDirection === 'cols' ? '左右相接' : '上下相接'})`;
-                }
+                if (ruleMode === 2 || ruleMode === 3) modeDetail += ` (${fixedDirection === 'cols' ? '固定行' : '固定列'})`;
+                else if (ruleMode === 5) modeDetail += ` (${fixedDirection === 'cols' ? '左右相接' : '上下相接'})`;
 
-                text = `<strong>當前模板：</strong>${currentTplName}<br>` +
-                       `<strong>適用規則：</strong>${modeDetail}<br>` +
-                       `<strong>模板簡介：</strong><br>` +
-                       (templateIntroductions[currentTemplateId]);
+                text = `<strong>當前模板：</strong>${currentTplName}<br><strong>適用規則：</strong>${modeDetail}<br><strong>模板簡介：</strong><br>${templateIntroductions[currentTemplateId]}`;
             } else {
                 text = modeHelpTexts[mode];
-                const checkedRadio = document.querySelector('input[name="sub-dir"]:checked');
-                const currentDir = checkedRadio ? checkedRadio.value : 'cols';
+                const currentDir = document.querySelector('input[name="sub-dir"]:checked')?.value || 'cols';
 
                 if (mode === "2" || mode === "3") {
                     const dirText = currentDir === 'cols' ? '固定行（左右固定，上下無限延伸）' : '固定列（上下固定，左右無限延伸）';
@@ -525,33 +248,18 @@
 
             const guidePanel = document.getElementById('operation-guide');
             if (guidePanel) {
-                if (isFromTemplate) {
-                    guidePanel.innerHTML = `<strong>💻 執行操作：</strong>
-                    <ul>
-                        <li style="color: #dc3545; font-weight: bold;">⚠️ 目前為內建模板模式，首盤「不能」切換黑白格狀態。</li>
-                        <li>請直接點擊「開始播放」或方向鍵按鈕。</li>
-                    </ul>`;
-                } else {
-                    guidePanel.innerHTML = `<strong>💻 執行操作：</strong>
-                    <ul>
-                        <li>點擊方格可切換黑白格狀態，但開始播放後不得再次切換黑白格狀態。</li>
-                    </ul>`;
-                }
+                guidePanel.innerHTML = isFromTemplate 
+                    ? `<strong>💻 執行操作：</strong><ul><li style="color: #dc3545; font-weight: bold;">⚠️ 目前為內建模板模式，首盤「不能」切換黑白格狀態。</li><li>請直接點擊「開始播放」或方向鍵按鈕。</li></ul>`
+                    : `<strong>💻 執行操作：</strong><ul><li>點擊方格可切換黑白格狀態，但開始播放後不得再次切換黑白格狀態。</li></ul>`;
             }
         }
 
         function updateParamNotice() {
             const val = ruleModeSelect.value;
-            const checkedRadio = document.querySelector('input[name="sub-dir"]:checked');
-            const currentDir = checkedRadio ? checkedRadio.value : 'cols';
+            const currentDir = document.querySelector('input[name="sub-dir"]:checked')?.value || 'cols';
             
             if (val === "1" || val === "2" || val === "3") {
-                let targetText = "";
-                if (val === "1") {
-                    targetText = "列數與行數";
-                } else {
-                    targetText = (currentDir === 'cols') ? "列數" : "行數";
-                }
+                const targetText = val === "1" ? "列數與行數" : (currentDir === 'cols' ? "列數" : "行數");
                 paramNotice.innerHTML = `⚠️ 備註：選擇${targetText}僅決定首盤範圍`;
                 paramNotice.style.display = "block";
             } else {
@@ -559,29 +267,17 @@
             }
         }
 
-        function validateInput(e) {
-            let val = parseInt(e.target.value);
-            if (isNaN(val) || val <= 0) val = 1;
-            e.target.value = val;
-        }
+        const validateInput = e => { e.target.value = Math.max(1, parseInt(e.target.value) || 1); };
+        const validateIntervalInput = e => { 
+            let v = parseFloat(e.target.value);
+            e.target.value = isNaN(v) ? 0.01 : Math.min(10, Math.max(0.01, v));
+        };
 
-        function validateIntervalInput(e) {
-            let val = parseFloat(e.target.value);
-            if (isNaN(val) || val < 0.01) {
-                val = 0.01; 
-            } else if (val > 10) {
-                val = 10;  
-            }
-            e.target.value = val;
-        }
-
-        rowsInput.addEventListener('change', validateInput);
-        colsInput.addEventListener('change', validateInput);
-        rowsInput.addEventListener('blur', validateInput);
-        colsInput.addEventListener('blur', validateInput);
-
-        intervalInput.addEventListener('change', validateIntervalInput);
-        intervalInput.addEventListener('blur', validateIntervalInput);
+        ['change', 'blur'].forEach(evt => {
+            rowsInput.addEventListener(evt, validateInput);
+            colsInput.addEventListener(evt, validateInput);
+            intervalInput.addEventListener(evt, validateIntervalInput);
+        });
 
         ruleModeSelect.addEventListener('change', () => {
             const val = ruleModeSelect.value;
@@ -593,67 +289,47 @@
             if (val === "2" || val === "3") {
                 subGroup.style.display = "block";
                 subLabel.innerText = "1-1. 選擇固定方向 (二選一):";
-                opt1Text.innerText = "固定行 (左右固定)";
-                opt2Text.innerText = "固定列 (上下固定)";
+                opt1Text.innerText = "固定行 (左右固定)"; opt2Text.innerText = "固定列 (上下固定)";
             } else if (val === "5") {
                 subGroup.style.display = "block";
                 subLabel.innerText = "1-1. 選擇相接方向 (二選一):";
-                opt1Text.innerText = "左右相接";
-                opt2Text.innerText = "上下相接";
+                opt1Text.innerText = "左右相接"; opt2Text.innerText = "上下相接";
             } else {
                 subGroup.style.display = "none";
             }
-
-            updateHelpPanel();
-            updateParamNotice();
+            updateHelpPanel(); updateParamNotice();
         });
 
         document.querySelectorAll('input[name="sub-dir"]').forEach(radio => {
             radio.addEventListener('change', () => {
                 document.querySelectorAll('.btn-group-label').forEach(lbl => lbl.classList.remove('active'));
-                if (radio.checked) {
-                    radio.parentElement.classList.add('active');
-                }
-                updateHelpPanel();
-                updateParamNotice();
+                if (radio.checked) radio.parentElement.classList.add('active');
+                updateHelpPanel(); updateParamNotice();
             });
         });
 
         let rows, cols, intervalSec, ruleMode, fixedDirection;
         let array = [];
         let historyArrays = [];
-        let seenPatterns = {};
-        let roundNum = 0;
-        let currentViewIdx = 0;
-
-        let isSettingMode = true;
-        let isPaused = true;
-        let isTerminated = false;
-        let terminationReason = "";
-        let gameIntervalId = null;
-
-        let isFromTemplate = false;
-        let currentTemplateId = 0;
+        let seenPatterns = new Map(); // 【優化 2】改用 Map 提升查找效率
+        let roundNum = 0, currentViewIdx = 0;
+        let isSettingMode = true, isPaused = true, isTerminated = false;
+        let terminationReason = "", gameIntervalId = null;
+        let isFromTemplate = false, currentTemplateId = 0;
 
         const canvas = document.getElementById('grid-canvas');
         const ctx = canvas.getContext('2d');
         const statusTitle = document.getElementById('status-title');
-
         const playPauseBtn = document.getElementById('play-pause-btn');
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
         const clearBtn = document.getElementById('clear-btn');
-        
         const speedSlider = document.getElementById('dynamic-speed');
         const speedValDisplay = document.getElementById('speed-val');
 
         const ruleNames = {
-            1: "無界",
-            2: "有界 - 1對邊界 - 不相接",
-            3: "有界 - 1對邊界 - 相接1對",
-            4: "有界 - 2對邊界 - 不相接",
-            5: "有界 - 2對邊界 - 相接1對",
-            6: "有界 - 2對邊界 - 相接2對"
+            1: "無界", 2: "有界 - 1對邊界 - 不相接", 3: "有界 - 1對邊界 - 相接1對",
+            4: "有界 - 2對邊界 - 不相接", 5: "有界 - 2對邊界 - 相接1對", 6: "有界 - 2對邊界 - 相接2對"
         };
 
         let currentContainerSize = 521; 
@@ -661,213 +337,114 @@
         function getGridGeometry(hRows, hCols) {
             const dynamicPadding = Math.max(6, Math.floor(currentContainerSize * 0.025)); 
             const usableSize = currentContainerSize - (dynamicPadding * 2) - 1; 
-            
-            let snapW, snapH;
+            const snapW = Math.floor(Math.min(usableSize / hCols, usableSize / hRows) * 100) / 100;
 
-            const rawW = usableSize / hCols;
-            const rawH = usableSize / hRows;
-            const minRaw = Math.min(rawW, rawH);
-            snapW = Math.floor(minRaw * 100) / 100;
-            snapH = snapW;
+            const xCoords = Array.from({length: hCols + 1}, (_, j) => Math.round(j * snapW));
+            const yCoords = Array.from({length: hRows + 1}, (_, i) => Math.round(i * snapW));
 
-            const xCoords = [];
-            for (let j = 0; j <= hCols; j++) {
-                xCoords.push(Math.round(j * snapW));
-            }
-            const yCoords = [];
-            for (let i = 0; i <= hRows; i++) {
-                yCoords.push(Math.round(i * snapH));
-            }
-
-            const actualW = xCoords[hCols] - xCoords[0];
-            const actualH = yCoords[hRows] - yCoords[0];
-
-            const offsetX = dynamicPadding + Math.floor((currentContainerSize - (dynamicPadding * 2) - actualW) / 2);
-            const offsetY = dynamicPadding + Math.floor((currentContainerSize - (dynamicPadding * 2) - actualH) / 2);
-
-            return { xCoords, yCoords, offsetX, offsetY };
-        }
-
-        function handleGridClick(mouseX, mouseY) {
-            const displayArray = historyArrays[currentViewIdx] || array;
-            const hRows = displayArray.length;
-            const hCols = displayArray[0].length;
-
-            const geo = getGridGeometry(hRows, hCols);
-
-            const targetX = mouseX - geo.offsetX;
-            const targetY = mouseY - geo.offsetY;
-
-            let clickCol = -1;
-            let clickRow = -1;
-
-            for (let j = 0; j < hCols; j++) {
-                if (targetX >= geo.xCoords[j] && targetX < geo.xCoords[j+1]) {
-                    clickCol = j;
-                    break;
-                }
-            }
-            for (let i = 0; i < hRows; i++) {
-                if (targetY >= geo.yCoords[i] && targetY < geo.yCoords[i+1]) {
-                    clickRow = i;
-                    break;
-                }
-            }
-
-            if (clickRow >= 0 && clickRow < array.length && clickCol >= 0 && clickCol < array[0].length) {
-                array[clickRow][clickCol] = 1 - array[clickRow][clickCol];
-                render();
-            }
+            return { 
+                xCoords, yCoords, 
+                offsetX: dynamicPadding + Math.floor((usableSize + 1 - (xCoords[hCols] - xCoords[0])) / 2), 
+                offsetY: dynamicPadding + Math.floor((usableSize + 1 - (yCoords[hRows] - yCoords[0])) / 2) 
+            };
         }
 
         canvas.addEventListener('pointerdown', (e) => {
-            if (!isSettingMode || e.button !== 0) return;
-            if (isFromTemplate) return; 
+            if (!isSettingMode || e.button !== 0 || isFromTemplate) return;
             const rect = canvas.getBoundingClientRect();
-            handleGridClick(e.clientX - rect.left, e.clientY - rect.top);
+            const mouseX = e.clientX - rect.left, mouseY = e.clientY - rect.top;
+            const dispArr = historyArrays[currentViewIdx] || array;
+            const geo = getGridGeometry(dispArr.length, dispArr[0].length);
+
+            const clickCol = geo.xCoords.findIndex((x, j) => mouseX >= geo.offsetX + x && mouseX < geo.offsetX + geo.xCoords[j+1]);
+            const clickRow = geo.yCoords.findIndex((y, i) => mouseY >= geo.offsetY + y && mouseY < geo.offsetY + geo.yCoords[i+1]);
+
+            if (clickRow >= 0 && clickRow < array.length && clickCol >= 0 && clickCol < array[0].length) {
+                array[clickRow][clickCol] ^= 1; // 使用 XOR 切換 0/1 狀態，更簡潔
+                render();
+            }
         });
 
         function resizeCanvas() {
             if (document.getElementById('game-container').style.display === 'flex') {
                 currentContainerSize = Math.min(canvasContainer.clientWidth, canvasContainer.clientHeight) || 521;
-                canvas.width = currentContainerSize;
-                canvas.height = currentContainerSize;
+                canvas.width = canvas.height = currentContainerSize;
                 render();
             }
         }
 
         document.getElementById('start-setup-btn').addEventListener('click', () => {
-            isFromTemplate = false; 
-            currentTemplateId = 0;
-            specialStatusText = ""; 
-
+            isFromTemplate = false; currentTemplateId = 0; specialStatusText = ""; 
             ruleMode = parseInt(ruleModeSelect.value);
-            
-            const checkedRadio = document.querySelector('input[name="sub-dir"]:checked');
-            fixedDirection = checkedRadio ? checkedRadio.value : 'cols';
+            fixedDirection = document.querySelector('input[name="sub-dir"]:checked')?.value || 'cols';
 
-            intervalSec = parseFloat(intervalInput.value);
+            intervalSec = parseFloat(intervalInput.value) || 0.2;
             if (intervalSec > 10) intervalSec = 10;
-            if (isNaN(intervalSec) || intervalSec <= 0) intervalSec = 0.2;
 
-            rows = parseInt(rowsInput.value);
-            cols = parseInt(colsInput.value);
+            rows = parseInt(rowsInput.value); cols = parseInt(colsInput.value);
+            if (isNaN(rows) || rows <= 0 || isNaN(cols) || cols <= 0) return alert("請輸入正確的數值！");
 
-            if (isNaN(rows) || rows <= 0 || isNaN(cols) || cols <= 0) {
-                alert("請輸入正確的數值！");
-                return;
-            }
-
-            speedSlider.value = intervalSec;
-            speedValDisplay.innerText = `${intervalSec.toFixed(2)}s`;
-
-            array = Array(rows).fill().map(() => Array(cols).fill(0));
-            historyArrays = [];
-            seenPatterns = {};
-            roundNum = 0;
-            currentViewIdx = 0;
-            isSettingMode = true;
-            isPaused = true;
-            isTerminated = false;
-            terminationReason = "";
+            speedSlider.value = intervalSec; speedValDisplay.innerText = `${intervalSec.toFixed(2)}s`;
+            
+            array = createEmptyGrid(rows, cols);
+            historyArrays = []; seenPatterns.clear();
+            roundNum = currentViewIdx = 0;
+            isSettingMode = isPaused = true; isTerminated = false; terminationReason = "";
             if (gameIntervalId) clearInterval(gameIntervalId);
 
             document.getElementById('setup-container').style.display = 'none';
             document.getElementById('game-container').style.display = 'flex';
 
-            resizeCanvas();
-            updateHelpPanel(); 
-            updateButtonUI();
+            resizeCanvas(); updateHelpPanel(); updateButtonUI();
         });
 
         function checkPowerOfTwoMinusOne(num) {
             if (num < 0) return { match: false, a: -1 };
             let target = num + 1;
-            if ((target & (target - 1)) === 0 && target > 0) {
-                let a = Math.round(Math.log2(target));
-                return { match: true, a: a };
-            }
+            if ((target & (target - 1)) === 0 && target > 0) return { match: true, a: Math.round(Math.log2(target)) };
             return { match: false, a: -1 };
         }
 
         function loadTemplate(templateId) {
-            isFromTemplate = true; 
-            currentTemplateId = templateId;
-            specialStatusText = ""; 
+            isFromTemplate = true; currentTemplateId = templateId; specialStatusText = ""; 
+            let presetRule = 1, presetRows = 15, presetCols = 15, presetDir = 'cols';
 
-            let presetRule = 1;
-            let presetRows = 15;
-            let presetCols = 15;
-            let presetDir = 'cols';
-
-            if (templateId === 1) {
-                presetRule = 1;
-                presetRows = 5;
-                presetCols = 5;
-            } else {
+            if (templateId === 1) { presetRows = 5; presetCols = 5; }
+            else {
                 switch(templateId) {
-                    case 2: presetRule = 4; presetRows = 15; presetCols = 15; break;
-                    case 3: presetRule = 4; presetRows = 17; presetCols = 17; break;
-                    case 4: presetRule = 4; presetRows = 13; presetCols = 13; break;
-                    case 5: presetRule = 5; presetRows = 3;  presetCols = 16; presetDir = 'cols'; break;
-                    case 6: presetRule = 5; presetRows = 3;  presetCols = 8;  presetDir = 'cols'; break;
-                    case 7: presetRule = 5; presetRows = 3;  presetCols = 36; presetDir = 'cols'; break;
-                    case 8: presetRule = 6; presetRows = 9;  presetCols = 9;  break;
+                    case 2: presetRule = 4; break;
+                    case 3: presetRule = 4; presetRows = presetCols = 17; break;
+                    case 4: presetRule = 4; presetRows = presetCols = 13; break;
+                    case 5: presetRule = 5; presetRows = 3; presetCols = 16; break;
+                    case 6: presetRule = 5; presetRows = 3; presetCols = 8; break;
+                    case 7: presetRule = 5; presetRows = 3; presetCols = 36; break;
+                    case 8: presetRule = 6; presetRows = presetCols = 9; break;
                 }
             }
 
-            ruleMode = presetRule;
-            rows = presetRows;
-            cols = presetCols;
-            fixedDirection = presetDir;
+            ruleMode = presetRule; rows = presetRows; cols = presetCols; fixedDirection = presetDir;
+            intervalSec = parseFloat(intervalInput.value) || 0.2;
+            speedSlider.value = intervalSec; speedValDisplay.innerText = `${intervalSec.toFixed(2)}s`;
 
-            intervalSec = parseFloat(intervalInput.value);
-            if (isNaN(intervalSec) || intervalSec <= 0) intervalSec = 0.2;
-            speedSlider.value = intervalSec;
-            speedValDisplay.innerText = `${intervalSec.toFixed(2)}s`;
-
-            array = Array(rows).fill().map(() => Array(cols).fill(0));
-
+            array = createEmptyGrid(rows, cols);
             switch (templateId) {
-                case 1:
-                    array[2][2] = 1;
-                    let check = checkPowerOfTwoMinusOne(0);
-                    if (check.match) {
-                        specialStatusText = `<br><span style="color:#e0a800; font-weight:bold;">a = ${check.a}，此盤為最大值</span>`;
-                    }
-                    break;
-                case 2: array[7][7] = 1; break;
-                case 3: array[8][8] = 1; break;
-                case 4: array[6][6] = 1; break;
-                case 5: array[0][7] = 1; break;
-                case 6: array[0][3] = 1; break;
-                case 7: array[0][17] = 1; break;
+                case 1: array[2][2] = 1; let check = checkPowerOfTwoMinusOne(0); if (check.match) specialStatusText = `<br><span style="color:#e0a800; font-weight:bold;">a = ${check.a}，此盤為最大值</span>`; break;
+                case 2: array[7][7] = 1; break; case 3: array[8][8] = 1; break; case 4: array[6][6] = 1; break;
+                case 5: array[0][7] = 1; break; case 6: array[0][3] = 1; break; case 7: array[0][17] = 1; break;
                 case 8: array[4][4] = 1; break;
             }
 
-            historyArrays = [];
-            historyArrays.push(JSON.parse(JSON.stringify(array)));
-            
-            seenPatterns = {};
-            if (ruleMode !== 1 && ruleMode !== 2 && ruleMode !== 3) {
-                seenPatterns[arrayHash(array)] = 0;
-            }
+            historyArrays = [cloneGrid(array)];
+            seenPatterns.clear();
+            if (ruleMode > 3) seenPatterns.set(getGridKey(array), 0);
 
-            roundNum = 0;
-            currentViewIdx = 0;
-            
-            isSettingMode = true;
-            isPaused = true; 
-            isTerminated = false;
-            terminationReason = "";
+            roundNum = currentViewIdx = 0;
+            isSettingMode = isPaused = true; isTerminated = false; terminationReason = "";
             if (gameIntervalId) clearInterval(gameIntervalId);
 
             document.getElementById('setup-container').style.display = 'none';
             document.getElementById('game-container').style.display = 'flex';
-
-            resizeCanvas();
-            updateHelpPanel(); 
-            updateButtonUI();
+            resizeCanvas(); updateHelpPanel(); updateButtonUI();
         }
 
         document.getElementById('back-btn').addEventListener('click', () => {
@@ -878,474 +455,227 @@
 
         clearBtn.addEventListener('click', () => {
             if (!isSettingMode || isFromTemplate) return; 
-            array = Array(rows).fill().map(() => Array(cols).fill(0));
+            array = createEmptyGrid(rows, cols);
             render();
         });
 
-        playPauseBtn.addEventListener('click', handlePlayPause);
-        prevBtn.addEventListener('click', handlePrevFrame);
-        nextBtn.addEventListener('click', handleNextFrame);
-
         speedSlider.addEventListener('input', () => {
-            intervalSec = parseFloat(speedSlider.value);
-            speedValDisplay.innerText = `${intervalSec.toFixed(2)}s`;
+            intervalSec = parseFloat(speedSlider.value); speedValDisplay.innerText = `${intervalSec.toFixed(2)}s`;
             if (!isSettingMode && !isPaused && !isTerminated) {
                 clearInterval(gameIntervalId);
-                let currentDelay = intervalSec * 1000;
-                gameIntervalId = setInterval(stepGame, currentDelay);
+                gameIntervalId = setInterval(stepGame, intervalSec * 1000);
             }
         });
+
+        const resetGameInterval = () => {
+            clearInterval(gameIntervalId);
+            stepGame();
+            if (!isTerminated && !isPaused) gameIntervalId = setInterval(stepGame, intervalSec * 1000);
+        };
 
         function handlePlayPause() {
             if (isSettingMode) {
-                if (isArrayEmpty(array) && !isFromTemplate) {
-                    alert("首盤沒有設定任何塗色方格，請先點擊網格進行塗色！");
-                    return;
-                }
-
-                isSettingMode = false;
-                isPaused = false;
-                historyArrays.push(JSON.parse(JSON.stringify(array)));
-                if (ruleMode !== 1 && ruleMode !== 2 && ruleMode !== 3) {
-                    seenPatterns[arrayHash(array)] = 0;
-                }
-                currentViewIdx = 0;
-                roundNum = 0;
-                
-                clearInterval(gameIntervalId);
-                stepGame(); 
-                if (!isTerminated && !isPaused) { 
-                    let initialDelay = intervalSec * 1000;
-                    gameIntervalId = setInterval(stepGame, initialDelay);
-                }
+                if (!array.some(r => r.includes(1)) && !isFromTemplate) return alert("首盤沒有設定任何塗色方格，請先點擊網格進行塗色！");
+                isSettingMode = isPaused = false;
+                historyArrays.push(cloneGrid(array));
+                if (ruleMode > 3) seenPatterns.set(getGridKey(array), 0);
+                currentViewIdx = roundNum = 0;
+                resetGameInterval();
             } else {
                 if (currentViewIdx < historyArrays.length - 1) {
-                    array = JSON.parse(JSON.stringify(historyArrays[currentViewIdx]));
-                    roundNum = currentViewIdx; 
-
-                    seenPatterns = {};
-                    if (ruleMode !== 1 && ruleMode !== 2 && ruleMode !== 3) {
-                        for (let i = 0; i <= currentViewIdx; i++) {
-                            seenPatterns[arrayHash(historyArrays[i])] = i;
-                        }
-                    }
-
-                    isTerminated = false;
-                    terminationReason = "";
-                    isPaused = false;
-                    
-                    clearInterval(gameIntervalId);
-                    stepGame();
-                    if (!isTerminated && !isPaused) {
-                        let nextDelay = intervalSec * 1000;
-                        gameIntervalId = setInterval(stepGame, nextDelay);
-                    }
-                } else {
-                    if (isTerminated) return; 
-
+                    array = cloneGrid(historyArrays[currentViewIdx]); roundNum = currentViewIdx; 
+                    seenPatterns.clear();
+                    if (ruleMode > 3) for (let i = 0; i <= currentViewIdx; i++) seenPatterns.set(getGridKey(historyArrays[i]), i);
+                    isTerminated = isPaused = false; terminationReason = "";
+                    resetGameInterval();
+                } else if (!isTerminated) {
                     isPaused = !isPaused;
-                    if (!isPaused) {
-                        clearInterval(gameIntervalId);
-                        stepGame();
-                        if (!isTerminated && !isPaused) {
-                            let nextDelay = intervalSec * 1000;
-                            gameIntervalId = setInterval(stepGame, nextDelay);
-                        }
-                    } else {
-                        clearInterval(gameIntervalId);
-                    }
+                    if (!isPaused) resetGameInterval();
+                    else clearInterval(gameIntervalId);
                 }
             }
-            render();
-            updateButtonUI();
+            render(); updateButtonUI();
         }
 
-        function handlePrevFrame() {
-            if (!isSettingMode && (isPaused || isTerminated)) {
-                if (currentViewIdx > 0) {
-                    currentViewIdx--;
-                    
-                    if (currentTemplateId === 1) {
-                        let checkThis = checkPowerOfTwoMinusOne(currentViewIdx);
-                        let checkPrev = checkPowerOfTwoMinusOne(currentViewIdx - 1);
-                        if (checkThis.match) {
-                            specialStatusText = `<br><span style="color:#e0a800; font-weight:bold;">a = ${checkThis.a}，此盤為最大值</span>`;
-                        } else if (checkPrev.match) {
-                            specialStatusText = `<br><span style="color:#28a745; font-weight:bold;">此盤為最小值</span>`;
-                        } else {
-                            specialStatusText = "";
-                        }
-                    }
+        function checkTemplate1Status(idx) {
+            if (currentTemplateId !== 1) return;
+            const cThis = checkPowerOfTwoMinusOne(idx), cPrev = checkPowerOfTwoMinusOne(idx - 1);
+            specialStatusText = cThis.match ? `<br><span style="color:#e0a800; font-weight:bold;">a = ${cThis.a}，此盤為最大值</span>` : 
+                               (cPrev.match ? `<br><span style="color:#28a745; font-weight:bold;">此盤為最小值</span>` : "");
+        }
 
-                    render(); 
-                    updateButtonUI();
-                }
+        playPauseBtn.addEventListener('click', handlePlayPause);
+        prevBtn.addEventListener('click', () => {
+            if (!isSettingMode && (isPaused || isTerminated) && currentViewIdx > 0) {
+                currentViewIdx--; checkTemplate1Status(currentViewIdx); render(); updateButtonUI();
             }
-        }
-
-        function handleNextFrame() {
+        });
+        nextBtn.addEventListener('click', () => {
             if (isSettingMode) {
-                if (isArrayEmpty(array) && !isFromTemplate) {
-                    alert("首盤沒有設定塗色方格，請先點擊網格進行塗色！");
-                    return;
-                }
-                isSettingMode = false;
-                historyArrays = [];
-                historyArrays.push(JSON.parse(JSON.stringify(array)));
-                if (ruleMode !== 1 && ruleMode !== 2 && ruleMode !== 3) {
-                    seenPatterns = {};
-                    seenPatterns[arrayHash(array)] = 0;
-                }
-                currentViewIdx = 0;
-                roundNum = 0;
+                if (!array.some(r => r.includes(1)) && !isFromTemplate) return alert("首盤沒有設定塗色方格，請先點擊網格進行塗色！");
+                isSettingMode = false; historyArrays = [cloneGrid(array)];
+                if (ruleMode > 3) { seenPatterns.clear(); seenPatterns.set(getGridKey(array), 0); }
+                currentViewIdx = roundNum = 0;
             }
-
             if (!isSettingMode && (isPaused || isTerminated)) {
                 if (currentViewIdx < historyArrays.length - 1) {
-                    currentViewIdx++;
-                    
-                    if (currentTemplateId === 1) {
-                        let checkThis = checkPowerOfTwoMinusOne(currentViewIdx);
-                        let checkPrev = checkPowerOfTwoMinusOne(currentViewIdx - 1);
-                        if (checkThis.match) {
-                            specialStatusText = `<br><span style="color:#e0a800; font-weight:bold;">a = ${checkThis.a}，此盤為最大值</span>`;
-                        } else if (checkPrev.match) {
-                            specialStatusText = `<br><span style="color:#28a745; font-weight:bold;">此盤為最小值</span>`;
-                        } else {
-                            specialStatusText = "";
-                        }
-                    }
-
-                    render(); 
-                    updateButtonUI();
+                    currentViewIdx++; checkTemplate1Status(currentViewIdx); render(); updateButtonUI();
                 } else {
-                    isTerminated = false;
-                    terminationReason = "";
-                    array = JSON.parse(JSON.stringify(historyArrays[currentViewIdx]));
-                    roundNum = currentViewIdx;
-
-                    seenPatterns = {};
-                    if (ruleMode !== 1 && ruleMode !== 2 && ruleMode !== 3) {
-                        for (let i = 0; i <= currentViewIdx; i++) {
-                            seenPatterns[arrayHash(historyArrays[i])] = i;
-                        }
-                    }
-
-                    stepGame();
-                    updateButtonUI();
+                    isTerminated = false; terminationReason = "";
+                    array = cloneGrid(historyArrays[currentViewIdx]); roundNum = currentViewIdx;
+                    seenPatterns.clear();
+                    if (ruleMode > 3) for (let i = 0; i <= currentViewIdx; i++) seenPatterns.set(getGridKey(historyArrays[i]), i);
+                    stepGame(); updateButtonUI();
                 }
             }
-        }
+        });
 
         function updateButtonUI() {
             if (isSettingMode) {
                 clearBtn.style.display = isFromTemplate ? "none" : "block"; 
-                playPauseBtn.innerText = "開始播放";
-                playPauseBtn.className = "btn-ctrl btn-play";
-                prevBtn.disabled = true;
-                nextBtn.disabled = true;
+                playPauseBtn.innerText = "開始播放"; playPauseBtn.className = "btn-ctrl btn-play";
+                prevBtn.disabled = nextBtn.disabled = true;
             } else {
                 clearBtn.style.display = "none"; 
                 const isViewingHistory = currentViewIdx < historyArrays.length - 1;
-
-                if (isViewingHistory || isPaused) {
-                    playPauseBtn.innerText = "繼續播放";
-                    playPauseBtn.className = "btn-ctrl btn-play";
-                } else if (isTerminated) {
-                    playPauseBtn.innerText = "已終止";
-                    playPauseBtn.className = "btn-ctrl btn-secondary";
-                } else {
-                    playPauseBtn.innerText = "暫停播放";
-                    playPauseBtn.className = "btn-ctrl btn-pause";
-                }
-
-                prevBtn.disabled = (currentViewIdx === 0);
-                nextBtn.disabled = false;
+                if (isViewingHistory || isPaused) { playPauseBtn.innerText = "繼續播放"; playPauseBtn.className = "btn-ctrl btn-play"; } 
+                else if (isTerminated) { playPauseBtn.innerText = "已終止"; playPauseBtn.className = "btn-ctrl btn-secondary"; } 
+                else { playPauseBtn.innerText = "暫停播放"; playPauseBtn.className = "btn-ctrl btn-pause"; }
+                prevBtn.disabled = currentViewIdx === 0; nextBtn.disabled = false;
             }
         }
 
         function padArrayEdges(arr, mode) {
-            if (mode === 4 || mode === 5 || mode === 6) {
-                return arr;
-            }
+            if (mode > 3) return arr;
+            const r = arr.length, c = arr[0].length;
+            const allowTB = mode === 1 || fixedDirection !== 'rows';
+            const allowLR = mode === 1 || fixedDirection !== 'cols';
 
-            const r = arr.length;
-            const c = arr[0].length;
-            
-            let allowTopBottom = true;
-            let allowLeftRight = true;
+            const needT = allowTB && arr[0].includes(1), needB = allowTB && arr[r-1].includes(1);
+            const needL = allowLR && arr.some(row => row[0] === 1), needR = allowLR && arr.some(row => row[c-1] === 1);
 
-            if (mode === 2 || mode === 3) {
-                if (fixedDirection === 'cols') {
-                    allowLeftRight = false; 
-                } else {
-                    allowTopBottom = false; 
-                }
-            }
+            if (!(needT || needB || needL || needR)) return arr;
 
-            const needTop = allowTopBottom && arr[0].some(v => v === 1);
-            const needBottom = allowTopBottom && arr[r-1].some(v => v === 1);
-            const needLeft = allowLeftRight && arr.some(row => row[0] === 1);
-            const needRight = allowLeftRight && arr.some(row => row[c-1] === 1);
-
-            if (!(needTop || needBottom || needLeft || needRight)) {
-                return arr;
-            }
-
-            let padT = 0, padB = 0, padL = 0, padR = 0;
-            
-            if (mode === 1) {
-                padT = 1; padB = 1; padL = 1; padR = 1;
-            } else {
-                if (allowTopBottom) { padT = 1; padB = 1; }
-                if (allowLeftRight) { padL = 1; padR = 1; }
-            }
-
-            const newRows = r + padT + padB;
-            const newCols = c + padL + padR;
-            const newArr = Array(newRows).fill().map(() => Array(newCols).fill(0));
-
-            for (let i = 0; i < r; i++) {
-                for (let j = 0; j < c; j++) {
-                    newArr[i + padT][j + padL] = arr[i][j];
-                }
-            }
-            
+            const padT = allowTB ? 1 : 0, padL = allowLR ? 1 : 0;
+            const newArr = createEmptyGrid(r + (allowTB ? 2 : 0), c + (allowLR ? 2 : 0));
+            for (let i = 0; i < r; i++) for (let j = 0; j < c; j++) newArr[i + padT][j + padL] = arr[i][j];
             return newArr;
         }
 
         function updateArray(arr, mode) {
             arr = padArrayEdges(arr, mode);
-
-            const r = arr.length;
-            const c = arr[0].length;
-            const newArr = Array(r).fill().map(() => Array(c).fill(0));
+            const r = arr.length, c = arr[0].length;
+            const newArr = createEmptyGrid(r, c);
+            const wrapTB = mode === 6 || (mode === 5 && fixedDirection === 'rows') || (mode === 3 && fixedDirection === 'rows');
+            const wrapLR = mode === 6 || (mode === 5 && fixedDirection === 'cols') || (mode === 3 && fixedDirection === 'cols');
 
             for (let i = 0; i < r; i++) {
                 for (let j = 0; j < c; j++) {
                     let total = 0;
-                    
-                    const isWrapTopBottom = (mode === 6) || (mode === 5 && fixedDirection === 'rows') || (mode === 3 && fixedDirection === 'rows');
-                    const isWrapLeftRight = (mode === 6) || (mode === 5 && fixedDirection === 'cols') || (mode === 3 && fixedDirection === 'cols');
-
-                    if (i > 0) {
-                        total += arr[i - 1][j];
-                    } else if (isWrapTopBottom) {
-                        total += arr[r - 1][j];
-                    }
-
-                    if (i < r - 1) {
-                        total += arr[i + 1][j];
-                    } else if (isWrapTopBottom) {
-                        total += arr[0][j];
-                    }
-
-                    if (j > 0) {
-                        total += arr[i][j - 1];
-                    } else if (isWrapLeftRight) {
-                        total += arr[i][c - 1];
-                    }
-
-                    if (j < c - 1) {
-                        total += arr[i][j + 1];
-                    } else if (isWrapLeftRight) {
-                        total += arr[i][0];
-                    }
-                    
-                    newArr[i][j] = total % 2;
+                    if (i > 0) total += arr[i - 1][j]; else if (wrapTB) total += arr[r - 1][j];
+                    if (i < r - 1) total += arr[i + 1][j]; else if (wrapTB) total += arr[0][j];
+                    if (j > 0) total += arr[i][j - 1]; else if (wrapLR) total += arr[i][c - 1];
+                    if (j < c - 1) total += arr[i][j + 1]; else if (wrapLR) total += arr[i][0];
+                    newArr[i][j] = total & 1; // 【優化 4】使用位元運算加速取餘數
                 }
             }
-
             return newArr;
-        }
-
-        function isArrayEmpty(arr) {
-            return !arr.some(row => row.some(cell => cell === 1));
         }
 
         function render() {
             const displayArray = historyArrays[currentViewIdx] || array;
-            if (!displayArray || displayArray.length === 0) return;
+            if (!displayArray?.length) return;
 
-            const hRows = displayArray.length;
-            const hCols = displayArray[0].length;
-
-            ctx.clearRect(0, 0, currentContainerSize, currentContainerSize);
-
+            const hRows = displayArray.length, hCols = displayArray[0].length;
             const geo = getGridGeometry(hRows, hCols);
+
+            // 【優化 5】Canvas 繪製效能優化：一次性填白背景，只針對 1 的區塊填黑
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, currentContainerSize, currentContainerSize);
+            ctx.fillStyle = '#000000';
 
             for (let i = 0; i < hRows; i++) {
                 for (let j = 0; j < hCols; j++) {
-                    ctx.fillStyle = displayArray[i][j] === 1 ? '#000000' : '#ffffff';
-                    
-                    const x1 = geo.offsetX + geo.xCoords[j];
-                    const x2 = geo.offsetX + geo.xCoords[j+1];
-                    const y1 = geo.offsetY + geo.yCoords[i];
-                    const y2 = geo.offsetY + geo.yCoords[i+1];
-                    
-                    ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+                    if (displayArray[i][j] === 1) {
+                        ctx.fillRect(geo.offsetX + geo.xCoords[j], geo.offsetY + geo.yCoords[i], geo.xCoords[j+1] - geo.xCoords[j], geo.yCoords[i+1] - geo.yCoords[i]);
+                    }
                 }
             }
 
-            ctx.strokeStyle = '#d0d0d0'; 
-            ctx.lineWidth = 1; 
-            ctx.beginPath();
-            
-            const startLineX = geo.offsetX + geo.xCoords[0] + 0.5;
-            const endLineX = geo.offsetX + geo.xCoords[hCols] + 0.5;
-            const startLineY = geo.offsetY + geo.yCoords[0] + 0.5;
-            const endLineY = geo.offsetY + geo.yCoords[hRows] + 0.5;
-
-            for (let j = 0; j <= hCols; j++) {
-                const x = geo.offsetX + geo.xCoords[j] + 0.5;
-                ctx.moveTo(x, startLineY);
-                ctx.lineTo(x, endLineY);
-            }
-            for (let i = 0; i <= hRows; i++) {
-                const y = geo.offsetY + geo.yCoords[i] + 0.5;
-                ctx.moveTo(startLineX, y);
-                ctx.lineTo(endLineX, y);
-            }
+            // 畫格線
+            ctx.strokeStyle = '#d0d0d0'; ctx.lineWidth = 1; ctx.beginPath();
+            const startX = geo.offsetX + geo.xCoords[0] + 0.5, endX = geo.offsetX + geo.xCoords[hCols] + 0.5;
+            const startY = geo.offsetY + geo.yCoords[0] + 0.5, endY = geo.offsetY + geo.yCoords[hRows] + 0.5;
+            for (let j = 0; j <= hCols; j++) { const x = geo.offsetX + geo.xCoords[j] + 0.5; ctx.moveTo(x, startY); ctx.lineTo(x, endY); }
+            for (let i = 0; i <= hRows; i++) { const y = geo.offsetY + geo.yCoords[i] + 0.5; ctx.moveTo(startX, y); ctx.lineTo(endX, y); }
             ctx.stroke();
 
-            const hasLeftRightWrap = (ruleMode === 6) || (ruleMode === 5 && fixedDirection === 'cols') || (ruleMode === 3 && fixedDirection === 'cols');
-            const hasTopBottomWrap = (ruleMode === 6) || (ruleMode === 5 && fixedDirection === 'rows') || (ruleMode === 3 && fixedDirection === 'rows');
+            const wrapLR = ruleMode === 6 || (ruleMode === 5 && fixedDirection === 'cols') || (ruleMode === 3 && fixedDirection === 'cols');
+            const wrapTB = ruleMode === 6 || (ruleMode === 5 && fixedDirection === 'rows') || (ruleMode === 3 && fixedDirection === 'rows');
 
             ctx.lineWidth = 1.25; 
-
-            if (hasLeftRightWrap) {
-                ctx.strokeStyle = '#dc3545'; 
-                
-                ctx.beginPath();
-                ctx.moveTo(geo.offsetX + geo.xCoords[0], geo.offsetY + geo.yCoords[0]);
-                ctx.lineTo(geo.offsetX + geo.xCoords[0], geo.offsetY + geo.yCoords[hRows]);
+            if (wrapLR) {
+                ctx.strokeStyle = '#dc3545'; ctx.beginPath();
+                ctx.moveTo(geo.offsetX + geo.xCoords[0], geo.offsetY + geo.yCoords[0]); ctx.lineTo(geo.offsetX + geo.xCoords[0], geo.offsetY + geo.yCoords[hRows]);
+                ctx.moveTo(geo.offsetX + geo.xCoords[hCols], geo.offsetY + geo.yCoords[0]); ctx.lineTo(geo.offsetX + geo.xCoords[hCols], geo.offsetY + geo.yCoords[hRows]);
                 ctx.stroke();
-
-                ctx.beginPath();
-                ctx.moveTo(geo.offsetX + geo.xCoords[hCols], geo.offsetY + geo.yCoords[0]);
-                ctx.lineTo(geo.offsetX + geo.xCoords[hCols], geo.offsetY + geo.yCoords[hRows]);
+            }
+            if (wrapTB) {
+                ctx.strokeStyle = '#007bff'; ctx.beginPath();
+                ctx.moveTo(geo.offsetX + geo.xCoords[0], geo.offsetY + geo.yCoords[0]); ctx.lineTo(geo.offsetX + geo.xCoords[hCols], geo.offsetY + geo.yCoords[0]);
+                ctx.moveTo(geo.offsetX + geo.xCoords[0], geo.offsetY + geo.yCoords[hRows]); ctx.lineTo(geo.offsetX + geo.xCoords[hCols], geo.offsetY + geo.yCoords[hRows]);
                 ctx.stroke();
             }
 
-            if (hasTopBottomWrap) {
-                ctx.strokeStyle = '#007bff'; 
-                
-                ctx.beginPath();
-                ctx.moveTo(geo.offsetX + geo.xCoords[0], geo.offsetY + geo.yCoords[0]);
-                ctx.lineTo(geo.offsetX + geo.xCoords[hCols], geo.offsetY + geo.yCoords[0]);
-                ctx.stroke();
-
-                ctx.beginPath();
-                ctx.moveTo(geo.offsetX + geo.xCoords[0], geo.offsetY + geo.yCoords[hRows]);
-                ctx.lineTo(geo.offsetX + geo.xCoords[hCols], geo.offsetY + geo.yCoords[hRows]);
-                ctx.stroke();
-            }
-
-            const isDynamicSize = true;
             let modeDetail = ruleNames[ruleMode];
-            if (ruleMode === 2 || ruleMode === 3) {
-                modeDetail += ` (${fixedDirection === 'cols' ? '固定行' : '固定列'})`;
-            } else if (ruleMode === 5) {
-                modeDetail += ` (${fixedDirection === 'cols' ? '左右相接' : '上下相接'})`;
-            }
-            const sizeInfo = isDynamicSize ? `<br>(網格: ${hRows}x${hCols})` : '';
-
-            if (isSettingMode) {
-                if (isFromTemplate) {
-                    statusTitle.innerHTML = `[${modeDetail}]<br>模板已載入${sizeInfo}${specialStatusText}`;
-                } else {
-                    statusTitle.innerHTML = `[${modeDetail}]<br>請點擊方格設定首盤${sizeInfo}`;
-                }
-            } else {
-                if (isTerminated && currentViewIdx === historyArrays.length - 1) {
-                    statusTitle.innerHTML = `第 ${currentViewIdx} 盤${sizeInfo}<br><span style="color:red;">${terminationReason}</span>${specialStatusText}`;
-                } else if (isPaused || currentViewIdx < historyArrays.length - 1) {
-                    statusTitle.innerHTML = `第 ${currentViewIdx} 盤${sizeInfo}<br>(已暫停)${specialStatusText}`;
-                } else {
-                    statusTitle.innerHTML = `第 ${currentViewIdx} 盤${sizeInfo}${specialStatusText}`;
-                }
+            if (ruleMode === 2 || ruleMode === 3) modeDetail += ` (${fixedDirection === 'cols' ? '固定行' : '固定列'})`;
+            else if (ruleMode === 5) modeDetail += ` (${fixedDirection === 'cols' ? '左右相接' : '上下相接'})`;
+            
+            const sizeInfo = `<br>(網格: ${hRows}x${hCols})`;
+            if (isSettingMode) statusTitle.innerHTML = `[${modeDetail}]<br>${isFromTemplate ? '模板已載入' : '請點擊方格設定首盤'}${sizeInfo}${specialStatusText}`;
+            else {
+                if (isTerminated && currentViewIdx === historyArrays.length - 1) statusTitle.innerHTML = `第 ${currentViewIdx} 盤${sizeInfo}<br><span style="color:red;">${terminationReason}</span>${specialStatusText}`;
+                else if (isPaused || currentViewIdx < historyArrays.length - 1) statusTitle.innerHTML = `第 ${currentViewIdx} 盤${sizeInfo}<br>(已暫停)${specialStatusText}`;
+                else statusTitle.innerHTML = `第 ${currentViewIdx} 盤${sizeInfo}${specialStatusText}`;
             }
         }
 
         function stepGame() {
             let nextArray = updateArray(array, ruleMode);
             const nextRoundNum = roundNum + 1;
+            checkTemplate1Status(nextRoundNum);
 
-            if (currentTemplateId === 1) {
-                let checkNext = checkPowerOfTwoMinusOne(nextRoundNum);      
-                let checkCurrent = checkPowerOfTwoMinusOne(nextRoundNum - 1); 
-
-                if (checkNext.match) {
-                    specialStatusText = `<br><span style="color:#e0a800; font-weight:bold;">a = ${checkNext.a}，此盤為最大值</span>`;
-                } else if (checkCurrent.match) {
-                    specialStatusText = `<br><span style="color:#28a745; font-weight:bold;">此盤為最小值</span>`;
-                } else {
-                    specialStatusText = "";
+            if (ruleMode > 3) {
+                if (!nextArray.some(r => r.includes(1))) {
+                    historyArrays = [...historyArrays.slice(0, roundNum + 1), cloneGrid(nextArray)];
+                    array = nextArray; roundNum = currentViewIdx = nextRoundNum;
+                    isTerminated = true; terminationReason = `歸零 - 終止<br><span style="color:#6c757d; font-size:19.8px;">歸零盤次：第 ${nextRoundNum} 盤</span>`;
+                    clearInterval(gameIntervalId); render(); updateButtonUI(); return;
                 }
+
+                const nextKey = getGridKey(nextArray);
+                if (seenPatterns.has(nextKey)) {
+                    const prevRound = seenPatterns.get(nextKey);
+                    historyArrays = [...historyArrays.slice(0, roundNum + 1), cloneGrid(nextArray)];
+                    array = nextArray; roundNum = currentViewIdx = nextRoundNum;
+                    isTerminated = true; terminationReason = `與第 ${prevRound} 盤重複 - 終止<br><span style="color:#ff8c00; font-size:19.8px;">循環週期：${nextRoundNum} - ${prevRound} = ${nextRoundNum - prevRound} </span>`;
+                    clearInterval(gameIntervalId); render(); updateButtonUI(); return;
+                }
+                seenPatterns.set(nextKey, nextRoundNum);
             }
 
-            if (ruleMode !== 1 && ruleMode !== 2 && ruleMode !== 3) {
-                if (isArrayEmpty(nextArray)) {
-                    historyArrays = historyArrays.slice(0, roundNum + 1);
-                    historyArrays.push(JSON.parse(JSON.stringify(nextArray)));
-                    array = nextArray;
-                    roundNum = nextRoundNum;
-                    currentViewIdx = roundNum;
-                    isTerminated = true;
-                    terminationReason = `歸零 - 終止<br><span style="color:#6c757d; font-size:19.8px;">歸零盤次：第 ${nextRoundNum} 盤</span>`;
-                    clearInterval(gameIntervalId);
-                    render();
-                    updateButtonUI();
-                    return;
-                }
-
-                const nextHash = arrayHash(nextArray);
-                if (nextHash in seenPatterns) {
-                    const prevRound = seenPatterns[nextHash];
-                    historyArrays = historyArrays.slice(0, roundNum + 1);
-                    historyArrays.push(JSON.parse(JSON.stringify(nextArray)));
-                    array = nextArray;
-                    roundNum = nextRoundNum;
-                    currentViewIdx = roundNum;
-                    isTerminated = true;
-                    const period = nextRoundNum - prevRound;
-                    terminationReason = `與第 ${prevRound} 盤重複 - 終止<br><span style="color:#ff8c00; font-size:19.8px;">循環週期：${nextRoundNum} - ${prevRound} = ${period} </span>`;
-                    clearInterval(gameIntervalId);
-                    render();
-                    updateButtonUI();
-                    return;
-                }
-
-                seenPatterns[nextHash] = nextRoundNum;
-            }
-
-            historyArrays = historyArrays.slice(0, roundNum + 1);
-            historyArrays.push(JSON.parse(JSON.stringify(nextArray)));
-
-            array = nextArray;
-            roundNum = nextRoundNum;
-            currentViewIdx = roundNum;
-
-            render();
-            updateButtonUI();
+            historyArrays = [...historyArrays.slice(0, roundNum + 1), cloneGrid(nextArray)];
+            array = nextArray; roundNum = currentViewIdx = nextRoundNum;
+            render(); updateButtonUI();
         }
 
         updateParamNotice();
-
         window.addEventListener('resize', resizeCanvas);
-
         window.addEventListener('keydown', (e) => {
             if (document.getElementById('game-container').style.display !== 'flex') return;
-            if (e.key === ' ') {
-                e.preventDefault(); 
-                handlePlayPause();
-            } else if (e.key === 'ArrowLeft') {
-                e.preventDefault(); 
-                handlePrevFrame();
-            } else if (e.key === 'ArrowRight') {
-                e.preventDefault(); 
-                handleNextFrame();
-            }
+            if (e.key === ' ') { e.preventDefault(); handlePlayPause(); } 
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevBtn.click(); } 
+            else if (e.key === 'ArrowRight') { e.preventDefault(); nextBtn.click(); }
         });
     </script>
 </body>
