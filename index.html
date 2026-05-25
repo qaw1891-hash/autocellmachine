@@ -990,8 +990,10 @@
                     return;
                 }
                 isSettingMode = false;
+                historyArrays = [];
                 historyArrays.push(JSON.parse(JSON.stringify(array)));
                 if (ruleMode !== 1 && ruleMode !== 2 && ruleMode !== 3) {
+                    seenPatterns = {};
                     seenPatterns[arrayHash(array)] = 0;
                 }
                 currentViewIdx = 0;
