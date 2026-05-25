@@ -19,20 +19,39 @@
             -webkit-user-select: none;
             user-select: none;
             position: relative;
-            /* 原來 20px * 1.1 = 22px */
             font-size: 22px; 
         }
         
         #setup-container { 
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            max-width: 1050px; 
+            width: 100%; 
+            margin-top: 20px;
+            box-sizing: border-box; 
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .setup-panel {
             background: white; 
             padding: 25px; 
             border-radius: 10px; 
             box-shadow: 0 5px 8px rgba(0,0,0,0.1); 
-            max-width: 610px; 
-            width: 100%; 
-            text-align: center; 
-            margin-top: 20px;
-            box-sizing: border-box; 
+            box-sizing: border-box;
+        }
+
+        .setup-left {
+            max-width: 610px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .setup-right {
+            max-width: 420px;
+            width: 100%;
+            text-align: left;
         }
 
         #game-container { 
@@ -155,6 +174,45 @@
         button { background-color: #007bff; color: white; border: none; padding: 14px 24px; font-size: 22px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 8px; } 
         button:hover { background-color: #0056b3; }
         button:disabled { background-color: #cccccc; cursor: not-allowed; }
+        
+        .btn-template {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            font-size: 19.8px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            margin-top: 0;
+            transition: background-color 0.15s;
+        }
+        .btn-template:hover {
+            background-color: #495057;
+        }
+
+        summary {
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 12px;
+            background: #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            user-select: none;
+        }
+
+        .template-list-container {
+            max-height: 280px; 
+            overflow-y: auto; 
+            padding-right: 5px;
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            margin-top: 5px;
+        }
+
         h2 { font-size: 33px; margin-top: 0; color: #333; } 
         h3 { font-size: 22px; border-bottom: 3px solid #007bff; padding-bottom: 6px; margin-bottom: 12px; margin-top: 0; color: #333; } 
         
@@ -220,7 +278,6 @@
             pointer-events: none;
         }
 
-        /* 參數並排專用樣式 */
         .grid-inputs-row {
             display: flex;
             gap: 15px;
@@ -237,6 +294,14 @@
         }
 
         @media (orientation: portrait) or (max-height: 550px) {
+            #setup-container { 
+                flex-direction: column; 
+                align-items: center; 
+            }
+            .setup-left, .setup-right {
+                max-width: 600px;
+                width: 100%;
+            }
             #game-container { 
                 flex-direction: column; 
                 align-items: center; 
@@ -266,55 +331,74 @@
 <body>
 
     <div id="setup-container">
-        <h2>參數設定</h2>
-        <div class="form-group">
-            <label>1. 選擇邊界規則:</label>
-            <select id="rule-mode">
-                <option value="1">1. 無界</option>
-                <option value="2">2. 有界 - 1對邊界 - 不相接</option>
-                <option value="3">3. 有界 - 1對邊界 - 相接1對</option>
-                <option value="4">4. 有界 - 2對邊界 - 不相接</option>
-                <option value="5">5. 有界 - 2對邊界 - 相接1對</option>
-                <option value="6">6. 有界 - 2對邊界 - 相接2對</option>
-            </select>
-        </div>
-
-        <div class="form-group" id="sub-rule-group" style="display: none;">
-            <label id="sub-rule-label" style="font-size: 19.8px; margin-bottom: 4px;">1-1. 選擇固定方向 (二選一):</label>
-            <div class="btn-group-container">
-                <label class="btn-group-label active" id="opt1-label">
-                    <input type="radio" name="sub-dir" id="opt1" value="cols" checked>
-                    <span id="opt1-text">固定行 (左右固定)</span>
-                </label>
-                <label class="btn-group-label" id="opt2-label">
-                    <input type="radio" name="sub-dir" id="opt2" value="rows">
-                    <span id="opt2-text">固定列 (上下固定)</span>
-                </label>
+        <div class="setup-panel setup-left">
+            <h2>參數設定</h2>
+            <div class="form-group">
+                <label>1. 選擇邊界規則:</label>
+                <select id="rule-mode">
+                    <option value="1">1. 無界</option>
+                    <option value="2">2. 有界 - 1對邊界 - 不相接</option>
+                    <option value="3">3. 有界 - 1對邊界 - 相接1對</option>
+                    <option value="4">4. 有界 - 2對邊界 - 不相接</option>
+                    <option value="5">5. 有界 - 2對邊界 - 相接1對</option>
+                    <option value="6">6. 有界 - 2對邊界 - 相接2對</option>
+                </select>
             </div>
-        </div>
 
-        <div class="form-group">
-            <label>2. 設定其餘參數:</label>
-            
-            <div class="grid-inputs-row">
-                <div>
-                    <span>列數:</span>
-                    <input type="number" id="rows-input" value="15" min="1" style="font-size:19.8px;">
-                </div>
-                <div>
-                    <span>行數:</span>
-                    <input type="number" id="cols-input" value="15" min="1" style="font-size:19.8px;">
+            <div class="form-group" id="sub-rule-group" style="display: none;">
+                <label id="sub-rule-label" style="font-size: 19.8px; margin-bottom: 4px;">1-1. 選擇固定方向 (二選一):</label>
+                <div class="btn-group-container">
+                    <label class="btn-group-label active" id="opt1-label">
+                        <input type="radio" name="sub-dir" id="opt1" value="cols" checked>
+                        <span id="opt1-text">固定行 (左右固定)</span>
+                    </label>
+                    <label class="btn-group-label" id="opt2-label">
+                        <input type="radio" name="sub-dir" id="opt2" value="rows">
+                        <span id="opt2-text">固定列 (上下固定)</span>
+                    </label>
                 </div>
             </div>
 
-            <div id="param-notice" style="color: #666; font-size: 15.4px; margin-top: 5px; margin-bottom: 12px; line-height: 1.4; background: #fff3cd; border-left: 4px solid #ffc107; padding: 6px 10px; display: none;"></div>
+            <div class="form-group">
+                <label>2. 設定其餘參數:</label>
+                
+                <div class="grid-inputs-row">
+                    <div>
+                        <span>列數:</span>
+                        <input type="number" id="rows-input" value="15" min="1" style="font-size:19.8px;">
+                    </div>
+                    <div>
+                        <span>行數:</span>
+                        <input type="number" id="cols-input" value="15" min="1" style="font-size:19.8px;">
+                    </div>
+                </div>
 
-            <div style="display: flex; align-items: center; margin-top: 5px;">
-                <span style="white-space: nowrap; margin-right: 8px;">更新間隔 (秒):</span>
-                <input type="number" id="interval-input" value="0.2" step="0.1" min="0.01" max="10" style="width:120px; font-size:19.8px;">
+                <div id="param-notice" style="color: #666; font-size: 15.4px; margin-top: 5px; margin-bottom: 12px; line-height: 1.4; background: #fff3cd; border-left: 4px solid #ffc107; padding: 6px 10px; display: none;"></div>
+
+                <div style="display: flex; align-items: center; margin-top: 5px;">
+                    <span style="white-space: nowrap; margin-right: 8px;">更新間隔 (秒):</span>
+                    <input type="number" id="interval-input" value="1.0" step="0.1" min="0.01" max="10" style="width:120px; font-size:19.8px;">
+                </div>
             </div>
+            <button id="start-setup-btn">確定並開始設定首盤</button>
         </div>
-        <button id="start-setup-btn">確定並開始設定首盤</button>
+
+        <div class="setup-panel setup-right">
+            <h2>內建模板</h2>
+            <details open>
+                <summary>點擊展開/收合模板</summary>
+                <div class="template-list-container">
+                    <button class="btn-template" onclick="loadTemplate(1)">模板1: 最大最小值觀察模式</button>
+                    <button class="btn-template" onclick="loadTemplate(2)">模板2: 定理3(1)</button>
+                    <button class="btn-template" onclick="loadTemplate(3)">模板3: 定理3(2)</button>
+                    <button class="btn-template" onclick="loadTemplate(4)">模板4: 定理3(3)</button>
+                    <button class="btn-template" onclick="loadTemplate(5)">模板5: 定理4(1)</button>
+                    <button class="btn-template" onclick="loadTemplate(6)">模板6: 定理4(2)</button>
+                    <button class="btn-template" onclick="loadTemplate(7)">模板7: 定理4(3)</button>
+                    <button class="btn-template" onclick="loadTemplate(8)">模板8: 定理5</button>
+                </div>
+            </details>
+        </div>
     </div>
 
     <div id="game-container">
@@ -343,7 +427,7 @@
             <div id="dynamic-mode-help" class="help-item"></div>
 
             <h3>操作指南</h3>
-            <div class="help-item">
+            <div class="help-item" id="operation-guide">
                 <strong>💻 執行操作：</strong>
                 <ul>
                     <li>點擊方格可切換黑白格狀態，但開始播放後不得再次切換黑白格狀態。</li>
@@ -383,20 +467,77 @@
             6: `<strong>6. 有界 - 2對邊界 - 相接2對</strong><br>行、列固定，上下相接且左右相接。`
         };
 
+        const templateNames = {
+            1: "模板1: 最大最小值觀察模式",
+            2: "模板2: 定理3(1)",
+            3: "模板3: 定理3(2)",
+            4: "模板4: 定理3(3)",
+            5: "模板5: 定理4(1)",
+            6: "模板6: 定理4(2)",
+            7: "模板7: 定理4(3)",
+            8: "模板8: 定理5"
+        };
+
+        let specialStatusText = "";
+
+        const templateIntroductions = {
+            1: `此模式下，當盤數為 2^a-1 時為最大值，下一盤為最小值。`,
+            2: `此模式下，當 n=2^a-1 時，歸零盤次應為 2^(a-1)。此模板以 a=4, n=15 作為範例。`,
+            3: `此模式下，當 n=2^a+1 時，循環週期應為 2^a-2。此模板以 a=4, n=17 作為範例。`,
+            4: `此模式下，當 n=2^a-3 時，循環週期應為 2^a-2。此模板以 a=4, n=13 作為範例。`,
+            5: `依照定理4(1)的敘述（此略），此模板以 a=2, b=4 作為範例。`,
+            6: `依照定理4(2)的敘述（此略），此模板以 a=2, b=3 作為範例。`,
+            7: `依照定理4(3)的敘述（此略），此模板以 a=2, b=2, k=9 作為範例。`,
+            8: `此模式下，n*n 的循環週期為 2^p-2^q。此模板以 n=9 作為範例（此時 p=3, q=0）。`
+        };
+
         function updateHelpPanel() {
             const mode = ruleModeSelect.value;
-            let text = modeHelpTexts[mode];
-            const checkedRadio = document.querySelector('input[name="sub-dir"]:checked');
-            const currentDir = checkedRadio ? checkedRadio.value : 'cols';
+            let text = "";
 
-            if (mode === "2" || mode === "3") {
-                const dirText = currentDir === 'cols' ? '固定行（左右固定，上下無限延伸）' : '固定列（上下固定，左右無限延伸）';
-                text += `<br><span style="color:#ff8c00; font-weight:bold;">⚠️ 當前設定：${dirText}</span>`;
-            } else if (mode === "5") {
-                const dirText = currentDir === 'cols' ? '左右相接' : '上下相接';
-                text += `<br><span style="color:#ff8c00; font-weight:bold;">⚠️ 當前相接設定：${dirText}</span>`;
+            if (isFromTemplate) {
+                const currentTplName = templateNames[currentTemplateId] || `模板 ${currentTemplateId}`;
+                let modeDetail = ruleNames[ruleMode];
+                if (ruleMode === 2 || ruleMode === 3) {
+                    modeDetail += ` (${fixedDirection === 'cols' ? '固定行' : '固定列'})`;
+                } else if (ruleMode === 5) {
+                    modeDetail += ` (${fixedDirection === 'cols' ? '左右相接' : '上下相接'})`;
+                }
+
+                text = `<strong>當前模板：</strong>${currentTplName}<br>` +
+                       `<strong>適用規則：</strong>${modeDetail}<br>` +
+                       `<strong>模板簡介：</strong><br>` +
+                       (templateIntroductions[currentTemplateId]);
+            } else {
+                text = modeHelpTexts[mode];
+                const checkedRadio = document.querySelector('input[name="sub-dir"]:checked');
+                const currentDir = checkedRadio ? checkedRadio.value : 'cols';
+
+                if (mode === "2" || mode === "3") {
+                    const dirText = currentDir === 'cols' ? '固定行（左右固定，上下無限延伸）' : '固定列（上下固定，左右無限延伸）';
+                    text += `<br><span style="color:#ff8c00; font-weight:bold;">⚠️ 當前設定：${dirText}</span>`;
+                } else if (mode === "5") {
+                    const dirText = currentDir === 'cols' ? '左右相接' : '上下相接';
+                    text += `<br><span style="color:#ff8c00; font-weight:bold;">⚠️ 當前相接設定：${dirText}</span>`;
+                }
             }
             dynamicModeHelp.innerHTML = text;
+
+            const guidePanel = document.getElementById('operation-guide');
+            if (guidePanel) {
+                if (isFromTemplate) {
+                    guidePanel.innerHTML = `<strong>💻 執行操作：</strong>
+                    <ul>
+                        <li style="color: #dc3545; font-weight: bold;">⚠️ 目前為內建模板模式，首盤「不能」切換黑白格狀態。</li>
+                        <li>請直接點擊下方「開始播放」按鈕或使用鍵盤方向鍵。</li>
+                    </ul>`;
+                } else {
+                    guidePanel.innerHTML = `<strong>💻 執行操作：</strong>
+                    <ul>
+                        <li>點擊方格可切換黑白格狀態，但開始播放後不得再次切換黑白格狀態。</li>
+                    </ul>`;
+                }
+            }
         }
 
         function updateParamNotice() {
@@ -491,6 +632,9 @@
         let terminationReason = "";
         let gameIntervalId = null;
 
+        let isFromTemplate = false;
+        let currentTemplateId = 0;
+
         const canvas = document.getElementById('grid-canvas');
         const ctx = canvas.getContext('2d');
         const statusTitle = document.getElementById('status-title');
@@ -520,8 +664,6 @@
             
             let snapW, snapH;
 
-            // 修正處：將原本分開的寬高邏輯統一起來，確保不論在何種邊界模式下，
-            // 只要長寬比例不等（如列數>行數 或 行數>列數），都能取最小極限比例，不溢出外框。
             const rawW = usableSize / hCols;
             const rawH = usableSize / hRows;
             const minRaw = Math.min(rawW, rawH);
@@ -580,6 +722,7 @@
 
         canvas.addEventListener('pointerdown', (e) => {
             if (!isSettingMode || e.button !== 0) return;
+            if (isFromTemplate) return; 
             const rect = canvas.getBoundingClientRect();
             handleGridClick(e.clientX - rect.left, e.clientY - rect.top);
         });
@@ -594,6 +737,10 @@
         }
 
         document.getElementById('start-setup-btn').addEventListener('click', () => {
+            isFromTemplate = false; 
+            currentTemplateId = 0;
+            specialStatusText = ""; 
+
             ruleMode = parseInt(ruleModeSelect.value);
             
             const checkedRadio = document.querySelector('input[name="sub-dir"]:checked');
@@ -633,14 +780,104 @@
             updateButtonUI();
         });
 
+        function checkPowerOfTwoMinusOne(num) {
+            if (num < 0) return { match: false, a: -1 };
+            let target = num + 1;
+            if ((target & (target - 1)) === 0 && target > 0) {
+                let a = Math.round(Math.log2(target));
+                return { match: true, a: a };
+            }
+            return { match: false, a: -1 };
+        }
+
+        function loadTemplate(templateId) {
+            isFromTemplate = true; 
+            currentTemplateId = templateId;
+            specialStatusText = ""; 
+
+            let presetRule = 1;
+            let presetRows = 15;
+            let presetCols = 15;
+            let presetDir = 'cols';
+
+            if (templateId === 1) {
+                presetRule = 1;
+                presetRows = 5;
+                presetCols = 5;
+            } else {
+                switch(templateId) {
+                    case 2: presetRule = 4; presetRows = 15; presetCols = 15; break;
+                    case 3: presetRule = 4; presetRows = 17; presetCols = 17; break;
+                    case 4: presetRule = 4; presetRows = 13; presetCols = 13; break;
+                    case 5: presetRule = 5; presetRows = 3;  presetCols = 16; presetDir = 'cols'; break;
+                    case 6: presetRule = 5; presetRows = 3;  presetCols = 8;  presetDir = 'cols'; break;
+                    case 7: presetRule = 5; presetRows = 3;  presetCols = 36; presetDir = 'cols'; break;
+                    case 8: presetRule = 6; presetRows = 9;  presetCols = 9;  break;
+                }
+            }
+
+            ruleMode = presetRule;
+            rows = presetRows;
+            cols = presetCols;
+            fixedDirection = presetDir;
+
+            intervalSec = parseFloat(intervalInput.value);
+            if (isNaN(intervalSec) || intervalSec <= 0) intervalSec = 0.2;
+            speedSlider.value = intervalSec;
+            speedValDisplay.innerText = `${intervalSec.toFixed(2)}s`;
+
+            array = Array(rows).fill().map(() => Array(cols).fill(0));
+
+            switch (templateId) {
+                case 1:
+                    array[2][2] = 1;
+                    let check = checkPowerOfTwoMinusOne(0);
+                    if (check.match) {
+                        specialStatusText = `<br><span style="color:#e0a800; font-weight:bold;">a = ${check.a}，此盤為最大值</span>`;
+                    }
+                    break;
+                case 2: array[7][7] = 1; break;
+                case 3: array[8][8] = 1; break;
+                case 4: array[6][6] = 1; break;
+                case 5: array[0][7] = 1; break;
+                case 6: array[0][3] = 1; break;
+                case 7: array[0][17] = 1; break;
+                case 8: array[4][4] = 1; break;
+            }
+
+            historyArrays = [];
+            historyArrays.push(JSON.parse(JSON.stringify(array)));
+            
+            seenPatterns = {};
+            if (ruleMode !== 1 && ruleMode !== 2 && ruleMode !== 3) {
+                seenPatterns[arrayHash(array)] = 0;
+            }
+
+            roundNum = 0;
+            currentViewIdx = 0;
+            
+            isSettingMode = true;
+            isPaused = true; 
+            isTerminated = false;
+            terminationReason = "";
+            if (gameIntervalId) clearInterval(gameIntervalId);
+
+            document.getElementById('setup-container').style.display = 'none';
+            document.getElementById('game-container').style.display = 'flex';
+
+            resizeCanvas();
+            updateHelpPanel(); 
+            updateButtonUI();
+        }
+
         document.getElementById('back-btn').addEventListener('click', () => {
             if (gameIntervalId) clearInterval(gameIntervalId);
             document.getElementById('game-container').style.display = 'none';
-            document.getElementById('setup-container').style.display = 'block';
+            document.getElementById('setup-container').style.display = 'flex';
         });
 
         clearBtn.addEventListener('click', () => {
-            if (!isSettingMode) return;
+            if (!isSettingMode || isFromTemplate) return; 
             array = Array(rows).fill().map(() => Array(cols).fill(0));
             render();
         });
@@ -654,12 +891,18 @@
             speedValDisplay.innerText = `${intervalSec.toFixed(2)}s`;
             if (!isSettingMode && !isPaused && !isTerminated) {
                 clearInterval(gameIntervalId);
-                gameIntervalId = setInterval(stepGame, intervalSec * 1000);
+                let currentDelay = intervalSec * 1000;
+                gameIntervalId = setInterval(stepGame, currentDelay);
             }
         });
 
         function handlePlayPause() {
             if (isSettingMode) {
+                if (isArrayEmpty(array) && !isFromTemplate) {
+                    alert("首盤沒有設定任何塗色方格，請先點擊網格進行塗色！");
+                    return;
+                }
+
                 isSettingMode = false;
                 isPaused = false;
                 historyArrays.push(JSON.parse(JSON.stringify(array)));
@@ -668,7 +911,13 @@
                 }
                 currentViewIdx = 0;
                 roundNum = 0;
-                gameIntervalId = setInterval(stepGame, intervalSec * 1000);
+                
+                clearInterval(gameIntervalId);
+                stepGame(); 
+                if (!isTerminated && !isPaused) { 
+                    let initialDelay = intervalSec * 1000;
+                    gameIntervalId = setInterval(stepGame, initialDelay);
+                }
             } else {
                 if (currentViewIdx < historyArrays.length - 1) {
                     array = JSON.parse(JSON.stringify(historyArrays[currentViewIdx]));
@@ -686,13 +935,22 @@
                     isPaused = false;
                     
                     clearInterval(gameIntervalId);
-                    gameIntervalId = setInterval(stepGame, intervalSec * 1000);
+                    stepGame();
+                    if (!isTerminated && !isPaused) {
+                        let nextDelay = intervalSec * 1000;
+                        gameIntervalId = setInterval(stepGame, nextDelay);
+                    }
                 } else {
                     if (isTerminated) return; 
 
                     isPaused = !isPaused;
                     if (!isPaused) {
-                        gameIntervalId = setInterval(stepGame, intervalSec * 1000);
+                        clearInterval(gameIntervalId);
+                        stepGame();
+                        if (!isTerminated && !isPaused) {
+                            let nextDelay = intervalSec * 1000;
+                            gameIntervalId = setInterval(stepGame, nextDelay);
+                        }
                     } else {
                         clearInterval(gameIntervalId);
                     }
@@ -706,6 +964,19 @@
             if (!isSettingMode && (isPaused || isTerminated)) {
                 if (currentViewIdx > 0) {
                     currentViewIdx--;
+                    
+                    if (currentTemplateId === 1) {
+                        let checkThis = checkPowerOfTwoMinusOne(currentViewIdx);
+                        let checkPrev = checkPowerOfTwoMinusOne(currentViewIdx - 1);
+                        if (checkThis.match) {
+                            specialStatusText = `<br><span style="color:#e0a800; font-weight:bold;">a = ${checkThis.a}，此盤為最大值</span>`;
+                        } else if (checkPrev.match) {
+                            specialStatusText = `<br><span style="color:#28a745; font-weight:bold;">此盤為最小值</span>`;
+                        } else {
+                            specialStatusText = "";
+                        }
+                    }
+
                     render(); 
                     updateButtonUI();
                 }
@@ -713,9 +984,36 @@
         }
 
         function handleNextFrame() {
+            if (isSettingMode) {
+                if (isArrayEmpty(array) && !isFromTemplate) {
+                    alert("首盤沒有設定 any塗色方格，請先點擊網格進行塗色！");
+                    return;
+                }
+                isSettingMode = false;
+                historyArrays.push(JSON.parse(JSON.stringify(array)));
+                if (ruleMode !== 1 && ruleMode !== 2 && ruleMode !== 3) {
+                    seenPatterns[arrayHash(array)] = 0;
+                }
+                currentViewIdx = 0;
+                roundNum = 0;
+            }
+
             if (!isSettingMode && (isPaused || isTerminated)) {
                 if (currentViewIdx < historyArrays.length - 1) {
                     currentViewIdx++;
+                    
+                    if (currentTemplateId === 1) {
+                        let checkThis = checkPowerOfTwoMinusOne(currentViewIdx);
+                        let checkPrev = checkPowerOfTwoMinusOne(currentViewIdx - 1);
+                        if (checkThis.match) {
+                            specialStatusText = `<br><span style="color:#e0a800; font-weight:bold;">a = ${checkThis.a}，此盤為最大值</span>`;
+                        } else if (checkPrev.match) {
+                            specialStatusText = `<br><span style="color:#28a745; font-weight:bold;">此盤為最小值</span>`;
+                        } else {
+                            specialStatusText = "";
+                        }
+                    }
+
                     render(); 
                     updateButtonUI();
                 } else {
@@ -739,7 +1037,7 @@
 
         function updateButtonUI() {
             if (isSettingMode) {
-                clearBtn.style.display = "block"; 
+                clearBtn.style.display = isFromTemplate ? "none" : "block"; 
                 playPauseBtn.innerText = "開始播放";
                 playPauseBtn.className = "btn-ctrl btn-play";
                 prevBtn.disabled = true;
@@ -941,32 +1239,48 @@
                 ctx.stroke();
             }
 
-            const isDynamicSize = (ruleMode === 1 || ruleMode === 2 || ruleMode === 3);
+            const isDynamicSize = true;
             let modeDetail = ruleNames[ruleMode];
             if (ruleMode === 2 || ruleMode === 3) {
                 modeDetail += ` (${fixedDirection === 'cols' ? '固定行' : '固定列'})`;
             } else if (ruleMode === 5) {
                 modeDetail += ` (${fixedDirection === 'cols' ? '左右相接' : '上下相接'})`;
             }
-            const sizeInfo = isDynamicSize ? `<br>(網格: ${hCols}x${hRows})` : '';
+            const sizeInfo = isDynamicSize ? `<br>(網格: ${hRows}x${hCols})` : '';
 
             if (isSettingMode) {
-                statusTitle.innerHTML = `[${modeDetail}]<br>請點擊方格設定首盤${sizeInfo}`;
+                if (isFromTemplate) {
+                    statusTitle.innerHTML = `[${modeDetail}]<br>內建模板首盤已載入${sizeInfo}${specialStatusText}`;
+                } else {
+                    statusTitle.innerHTML = `[${modeDetail}]<br>請點擊方格設定首盤${sizeInfo}`;
+                }
             } else {
                 if (isTerminated && currentViewIdx === historyArrays.length - 1) {
-                    statusTitle.innerHTML = `第 ${currentViewIdx} 盤${sizeInfo}<br><span style="color:red;">${terminationReason}</span>`;
+                    statusTitle.innerHTML = `第 ${currentViewIdx} 盤${sizeInfo}<br><span style="color:red;">${terminationReason}</span>${specialStatusText}`;
                 } else if (isPaused || currentViewIdx < historyArrays.length - 1) {
-                    statusTitle.innerHTML = `第 ${currentViewIdx} 盤${sizeInfo}<br>(已暫停)`;
+                    statusTitle.innerHTML = `第 ${currentViewIdx} 盤${sizeInfo}<br>(已暫停)${specialStatusText}`;
                 } else {
-                    statusTitle.innerHTML = `第 ${currentViewIdx} 盤${sizeInfo}`;
+                    statusTitle.innerHTML = `第 ${currentViewIdx} 盤${sizeInfo}${specialStatusText}`;
                 }
             }
         }
 
         function stepGame() {
             let nextArray = updateArray(array, ruleMode);
-            
             const nextRoundNum = roundNum + 1;
+
+            if (currentTemplateId === 1) {
+                let checkNext = checkPowerOfTwoMinusOne(nextRoundNum);      
+                let checkCurrent = checkPowerOfTwoMinusOne(nextRoundNum - 1); 
+
+                if (checkNext.match) {
+                    specialStatusText = `<br><span style="color:#e0a800; font-weight:bold;">a = ${checkNext.a}，此盤為最大值</span>`;
+                } else if (checkCurrent.match) {
+                    specialStatusText = `<br><span style="color:#28a745; font-weight:bold;">此盤為最小值</span>`;
+                } else {
+                    specialStatusText = "";
+                }
+            }
 
             if (ruleMode !== 1 && ruleMode !== 2 && ruleMode !== 3) {
                 if (isArrayEmpty(nextArray)) {
@@ -993,7 +1307,7 @@
                     currentViewIdx = roundNum;
                     isTerminated = true;
                     const period = nextRoundNum - prevRound;
-                    terminationReason = `與第 ${prevRound} 盤重複 - 終止<br><span style="color:#ff8c00; font-size:19.8px;">循環週期：${period} (${nextRoundNum} - ${prevRound})</span>`;
+                    terminationReason = `與第 ${prevRound} 盤重複 - 終止<br><span style="color:#ff8c00; font-size:19.8px;">循環週期：${nextRoundNum} - ${prevRound} = ${period} </span>`;
                     clearInterval(gameIntervalId);
                     render();
                     updateButtonUI();
