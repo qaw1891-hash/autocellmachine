@@ -384,18 +384,18 @@
         </div>
 
         <div class="setup-panel setup-right">
-            <h2>內建模板</h2>
+            <h2>模板</h2>
             <details open>
                 <summary>點擊展開/收合模板</summary>
                 <div class="template-list-container">
-                    <button class="btn-template" onclick="loadTemplate(1)">模板1: 最大最小值觀察模式</button>
-                    <button class="btn-template" onclick="loadTemplate(2)">模板2: 定理3(1)</button>
-                    <button class="btn-template" onclick="loadTemplate(3)">模板3: 定理3(2)</button>
-                    <button class="btn-template" onclick="loadTemplate(4)">模板4: 定理3(3)</button>
-                    <button class="btn-template" onclick="loadTemplate(5)">模板5: 定理4(1)</button>
-                    <button class="btn-template" onclick="loadTemplate(6)">模板6: 定理4(2)</button>
-                    <button class="btn-template" onclick="loadTemplate(7)">模板7: 定理4(3)</button>
-                    <button class="btn-template" onclick="loadTemplate(8)">模板8: 定理5</button>
+                    <button class="btn-template" onclick="loadTemplate(1)">最大值、最小值觀察模式</button>
+                    <button class="btn-template" onclick="loadTemplate(2)">定理3(1)</button>
+                    <button class="btn-template" onclick="loadTemplate(3)">定理3(2)</button>
+                    <button class="btn-template" onclick="loadTemplate(4)">定理3(3)</button>
+                    <button class="btn-template" onclick="loadTemplate(5)">定理4(1)</button>
+                    <button class="btn-template" onclick="loadTemplate(6)">定理4(2)</button>
+                    <button class="btn-template" onclick="loadTemplate(7)">定理4(3)</button>
+                    <button class="btn-template" onclick="loadTemplate(8)">定理5</button>
                 </div>
             </details>
         </div>
@@ -468,14 +468,14 @@
         };
 
         const templateNames = {
-            1: "模板1: 最大最小值觀察模式",
-            2: "模板2: 定理3(1)",
-            3: "模板3: 定理3(2)",
-            4: "模板4: 定理3(3)",
-            5: "模板5: 定理4(1)",
-            6: "模板6: 定理4(2)",
-            7: "模板7: 定理4(3)",
-            8: "模板8: 定理5"
+            1: "最大值、最小值觀察模式",
+            2: "定理3(1)",
+            3: "定理3(2)",
+            4: "定理3(3)",
+            5: "定理4(1)",
+            6: "定理4(2)",
+            7: "定理4(3)",
+            8: "定理5"
         };
 
         let specialStatusText = "";
@@ -529,7 +529,7 @@
                     guidePanel.innerHTML = `<strong>💻 執行操作：</strong>
                     <ul>
                         <li style="color: #dc3545; font-weight: bold;">⚠️ 目前為內建模板模式，首盤「不能」切換黑白格狀態。</li>
-                        <li>請直接點擊下方「開始播放」按鈕或使用鍵盤方向鍵。</li>
+                        <li>請直接點擊「開始播放」或方向鍵按鈕。</li>
                     </ul>`;
                 } else {
                     guidePanel.innerHTML = `<strong>💻 執行操作：</strong>
@@ -986,7 +986,7 @@
         function handleNextFrame() {
             if (isSettingMode) {
                 if (isArrayEmpty(array) && !isFromTemplate) {
-                    alert("首盤沒有設定 any塗色方格，請先點擊網格進行塗色！");
+                    alert("首盤沒有設定塗色方格，請先點擊網格進行塗色！");
                     return;
                 }
                 isSettingMode = false;
@@ -1250,7 +1250,7 @@
 
             if (isSettingMode) {
                 if (isFromTemplate) {
-                    statusTitle.innerHTML = `[${modeDetail}]<br>內建模板首盤已載入${sizeInfo}${specialStatusText}`;
+                    statusTitle.innerHTML = `[${modeDetail}]<br>模板已載入${sizeInfo}${specialStatusText}`;
                 } else {
                     statusTitle.innerHTML = `[${modeDetail}]<br>請點擊方格設定首盤${sizeInfo}`;
                 }
