@@ -115,7 +115,7 @@
 
                 <div style="display: flex; align-items: center; margin-top: 5px;">
                     <span style="white-space: nowrap; margin-right: 8px;">更新間隔 (秒):</span>
-                    <input type="number" id="interval-input" value="1.0" step="0.1" min="0.01" max="10" style="width:120px; font-size:19.8px;">
+                    <input type="number" id="interval-input" value="1.0" step="0.1" min="0.001" max="10" style="width:120px; font-size:19.8px;">
                 </div>
             </div>
             <button id="start-setup-btn">確定並開始設定首盤</button>
@@ -133,7 +133,8 @@
                     <button class="btn-template" onclick="loadTemplate(5)">定理4(1)</button>
                     <button class="btn-template" onclick="loadTemplate(6)">定理4(2)</button>
                     <button class="btn-template" onclick="loadTemplate(7)">定理4(3)</button>
-                    <button class="btn-template" onclick="loadTemplate(8)">定理5</button>
+                    <button class="btn-template" onclick="loadTemplate(8)">定理5(1)</button>
+                    <button class="btn-template" onclick="loadTemplate(9)">定理5(2)</button>
                 </div>
             </details>
         </div>
@@ -148,7 +149,7 @@
             
             <div class="slider-container">
                 <span>間隔:</span>
-                <input type="range" id="dynamic-speed" min="0.01" max="10.0" step="0.01" value="0.2">
+                <input type="range" id="dynamic-speed" min="0.01" max="10.0" step="0.001" value="0.2">
                 <span id="speed-val">0.20s</span>
             </div>
 
@@ -205,7 +206,7 @@
 
         const templateNames = {
             1: "最大值、最小值觀察模式", 2: "定理3(1)", 3: "定理3(2)", 4: "定理3(3)",
-            5: "定理4(1)", 6: "定理4(2)", 7: "定理4(3)", 8: "定理5"
+            5: "定理4(1)", 6: "定理4(2)", 7: "定理4(3)", 8: "定理5(1)", 9: "定理5(2)"
         };
 
         let specialStatusText = "";
@@ -218,7 +219,8 @@
             5: `依照定理4(1)的敘述（此略），此模板以 a=2, b=4 作為範例。`,
             6: `依照定理4(2)的敘述（此略），此模板以 a=2, b=3 作為範例。`,
             7: `依照定理4(3)的敘述（此略），此模板以 a=2, b=2, k=9 作為範例。`,
-            8: `此模式下，n*n 的循環週期為 2^p-2^q。此模板以 n=7 作為範例（此時 p=3, q=0）。`
+            8: `此模式下，n*n 的循環週期為 2^p-2^q。此模板以 n=7 作為範例（此時 p=3, q=0）。`,
+            9: `此模式下，n=2^q, n*n應歸零，歸零盤次為2^q-1。此模板以 q=3, n=8 作為範例。`
         };
 
         function updateHelpPanel() {
@@ -270,7 +272,7 @@
         const validateInput = e => { e.target.value = Math.max(1, parseInt(e.target.value) || 1); };
         const validateIntervalInput = e => { 
             let v = parseFloat(e.target.value);
-            e.target.value = isNaN(v) ? 0.01 : Math.min(10, Math.max(0.01, v));
+            e.target.value = isNaN(v) ? 0.001 : Math.min(10, Math.max(0.001, v));
         };
 
         ['change', 'blur'].forEach(evt => {
@@ -419,6 +421,7 @@
                     case 6: presetRule = 5; presetRows = 3; presetCols = 8; break;
                     case 7: presetRule = 5; presetRows = 3; presetCols = 36; break;
                     case 8: presetRule = 6; presetRows = presetCols = 7; break;
+                    case 9: presetRule = 6; presetRows = presetCols = 8; break;
                 }
             }
 
@@ -431,7 +434,7 @@
                 case 1: array[2][2] = 1; let check = checkPowerOfTwoMinusOne(0); if (check.match) specialStatusText = `<br><span style="color:#e0a800; font-weight:bold;">a = ${check.a}，此盤為最大值</span>`; break;
                 case 2: array[7][7] = 1; break; case 3: array[8][8] = 1; break; case 4: array[6][6] = 1; break;
                 case 5: array[0][7] = 1; break; case 6: array[0][3] = 1; break; case 7: array[0][17] = 1; break;
-                case 8: array[3][3] = 1; break;
+                case 8: array[3][3] = 1; break; case 9: array[3][3] = 1; break;
             }
 
             historyArrays = [cloneGrid(array)];
