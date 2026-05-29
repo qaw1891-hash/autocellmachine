@@ -218,7 +218,7 @@
             5: `依照定理4(1)的敘述（此略），此模板以 a=2, b=4 作為範例。`,
             6: `依照定理4(2)的敘述（此略），此模板以 a=2, b=3 作為範例。`,
             7: `依照定理4(3)的敘述（此略），此模板以 a=2, b=2, k=9 作為範例。`,
-            8: `此模式下，n*n 的循環週期為 2^p-2^q。此模板以 n=9 作為範例（此時 p=3, q=0）。`
+            8: `此模式下，n*n 的循環週期為 2^p-2^q。此模板以 n=7 作為範例（此時 p=3, q=0）。`
         };
 
         function updateHelpPanel() {
@@ -418,7 +418,7 @@
                     case 5: presetRule = 5; presetRows = 3; presetCols = 16; break;
                     case 6: presetRule = 5; presetRows = 3; presetCols = 8; break;
                     case 7: presetRule = 5; presetRows = 3; presetCols = 36; break;
-                    case 8: presetRule = 6; presetRows = presetCols = 9; break;
+                    case 8: presetRule = 6; presetRows = presetCols = 7; break;
                 }
             }
 
@@ -431,7 +431,7 @@
                 case 1: array[2][2] = 1; let check = checkPowerOfTwoMinusOne(0); if (check.match) specialStatusText = `<br><span style="color:#e0a800; font-weight:bold;">a = ${check.a}，此盤為最大值</span>`; break;
                 case 2: array[7][7] = 1; break; case 3: array[8][8] = 1; break; case 4: array[6][6] = 1; break;
                 case 5: array[0][7] = 1; break; case 6: array[0][3] = 1; break; case 7: array[0][17] = 1; break;
-                case 8: array[4][4] = 1; break;
+                case 8: array[3][3] = 1; break;
             }
 
             historyArrays = [cloneGrid(array)];
