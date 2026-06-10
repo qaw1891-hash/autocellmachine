@@ -135,6 +135,7 @@
                     <button class="btn-template" onclick="loadTemplate(7)">定理4(3)</button>
                     <button class="btn-template" onclick="loadTemplate(8)">定理5(1)</button>
                     <button class="btn-template" onclick="loadTemplate(9)">定理5(2)</button>
+                    <button class="btn-template" onclick="loadTemplate(10)">康威的生命遊戲</button>
                 </div>
             </details>
         </div>
@@ -175,7 +176,7 @@
         </div>
     </div>
 
-    <div class="footer-credits">本程式使用Gemini生成，研究者僅提供想法及部分修改。</div>
+    <div class="footer-credits">本程式大部分使用Gemini生成，由研究者提供想法。</div>
 
     <script>
         // 【優化 1】極速二維陣列深拷貝函數，效能遠超 JSON.parse(JSON.stringify)
@@ -206,7 +207,8 @@
 
         const templateNames = {
             1: "最大值、最小值觀察模式", 2: "定理3(1)", 3: "定理3(2)", 4: "定理3(3)",
-            5: "定理4(1)", 6: "定理4(2)", 7: "定理4(3)", 8: "定理5(1)", 9: "定理5(2)"
+            5: "定理4(1)", 6: "定理4(2)", 7: "定理4(3)", 8: "定理5(1)", 9: "定理5(2)",
+            10: "康威的生命遊戲"
         };
 
         let specialStatusText = "";
@@ -219,8 +221,9 @@
             5: `依照定理4(1)的敘述（此略），此模板以 a=2, b=4 作為範例。`,
             6: `依照定理4(2)的敘述（此略），此模板以 a=2, b=3 作為範例。`,
             7: `依照定理4(3)的敘述（此略），此模板以 a=2, b=2, k=9 作為範例。`,
+            8: `此模式下，n=2^q, n*n應歸零，歸零盤次為2^q-1。此模板以 q=3, n=8 作為範例。`,
             9: `此模式下，n*n 的循環週期為 2^p-2^q。此模板以 n=7 作為範例（此時 p=3, q=0）。`,
-            8: `此模式下，n=2^q, n*n應歸零，歸零盤次為2^q-1。此模板以 q=3, n=8 作為範例。`
+            10: `經典的二維細胞自動機。每個格子會檢查周圍 8 個鄰居（包含斜角）。<br>1. 活細胞周圍有 2 或 3 個活鄰居時繼續存活，其餘情況死亡。<br>2. 死細胞周圍恰有 3 個活鄰居時復活。<br>此模板初始為隨機生成，邊界大小為 15x15，超出邊界的細胞忽略不計。`
         };
 
         function updateHelpPanel() {
@@ -232,6 +235,7 @@
                 let modeDetail = ruleNames[ruleMode];
                 if (ruleMode === 2 || ruleMode === 3) modeDetail += ` (${fixedDirection === 'cols' ? '固定行' : '固定列'})`;
                 else if (ruleMode === 5) modeDetail += ` (${fixedDirection === 'cols' ? '左右相接' : '上下相接'})`;
+                if (currentTemplateId === 10) modeDetail = "康威生命遊戲標準規則 (15x15 獨立邊界)";
 
                 text = `<strong>當前模板：</strong>${currentTplName}<br><strong>適用規則：</strong>${modeDetail}<br><strong>模板簡介：</strong><br>${templateIntroductions[currentTemplateId]}`;
             } else {
@@ -422,6 +426,7 @@
                     case 7: presetRule = 5; presetRows = 3; presetCols = 36; break;
                     case 8: presetRule = 6; presetRows = presetCols = 8; break;
                     case 9: presetRule = 6; presetRows = presetCols = 7; break;
+                    case 10: presetRule = 4; presetRows = presetCols = 15; break; // 康威生命遊戲設定 15x15 且有界
                 }
             }
 
@@ -435,6 +440,14 @@
                 case 2: array[7][7] = 1; break; case 3: array[8][8] = 1; break; case 4: array[6][6] = 1; break;
                 case 5: array[0][7] = 1; break; case 6: array[0][3] = 1; break; case 7: array[0][17] = 1; break;
                 case 8: array[3][3] = 1; break; case 9: array[3][3] = 1; break;
+                case 10:
+                    // 隨機生成活細胞，給予大約 30% 的活細胞機率
+                    for (let i = 0; i < rows; i++) {
+                        for (let j = 0; j < cols; j++) {
+                            array[i][j] = Math.random() < 0.3 ? 1 : 0;
+                        }
+                    }
+                    break;
             }
 
             historyArrays = [cloneGrid(array)];
@@ -478,7 +491,7 @@
 
         function handlePlayPause() {
             if (isSettingMode) {
-                if (!array.some(r => r.includes(1)) && !isFromTemplate) return alert("首盤沒有設定任何塗色方格，請先點擊網格進行塗色！");
+                if (!array.some(r => r.includes(1)) && !isFromTemplate) return alert("首盤沒有設定任何塗色方格，請先點擊方格進行塗色！");
                 isSettingMode = isPaused = false;
                 historyArrays.push(cloneGrid(array));
                 if (ruleMode > 3) seenPatterns.set(getGridKey(array), 0);
@@ -515,7 +528,7 @@
         });
         nextBtn.addEventListener('click', () => {
             if (isSettingMode) {
-                if (!array.some(r => r.includes(1)) && !isFromTemplate) return alert("首盤沒有設定塗色方格，請先點擊網格進行塗色！");
+                if (!array.some(r => r.includes(1)) && !isFromTemplate) return alert("首盤沒有設定塗色方格，請先點擊方格進行塗色！");
                 isSettingMode = false; historyArrays = [cloneGrid(array)];
                 if (ruleMode > 3) { seenPatterns.clear(); seenPatterns.set(getGridKey(array), 0); }
                 currentViewIdx = roundNum = 0;
@@ -566,6 +579,36 @@
         }
 
         function updateArray(arr, mode) {
+            // 【特殊判定】當前為康威的生命遊戲模板時
+            if (currentTemplateId === 10) {
+                const r = arr.length, c = arr[0].length;
+                const newArr = createEmptyGrid(r, c);
+                for (let i = 0; i < r; i++) {
+                    for (let j = 0; j < c; j++) {
+                        let neighbors = 0;
+                        // 檢查周圍八個方向的鄰居
+                        for (let di = -1; di <= 1; di++) {
+                            for (let dj = -1; dj <= 1; dj++) {
+                                if (di === 0 && dj === 0) continue;
+                                const ni = i + di;
+                                const nj = j + dj;
+                                // 邊界外不予理會 (視為死細胞)
+                                if (ni >= 0 && ni < r && nj >= 0 && nj < c) {
+                                    neighbors += arr[ni][nj];
+                                }
+                            }
+                        }
+                        // 康威生命遊戲的核心邏輯判定
+                        if (arr[i][j] === 1) {
+                            newArr[i][j] = (neighbors === 2 || neighbors === 3) ? 1 : 0;
+                        } else {
+                            newArr[i][j] = (neighbors === 3) ? 1 : 0;
+                        }
+                    }
+                }
+                return newArr;
+            }
+
             arr = padArrayEdges(arr, mode);
             const r = arr.length, c = arr[0].length;
             const newArr = createEmptyGrid(r, c);
@@ -633,8 +676,9 @@
             let modeDetail = ruleNames[ruleMode];
             if (ruleMode === 2 || ruleMode === 3) modeDetail += ` (${fixedDirection === 'cols' ? '固定行' : '固定列'})`;
             else if (ruleMode === 5) modeDetail += ` (${fixedDirection === 'cols' ? '左右相接' : '上下相接'})`;
+            if (currentTemplateId === 10) modeDetail = "康威生命遊戲";
             
-            const sizeInfo = `<br>(網格: ${hRows}x${hCols})`;
+            const sizeInfo = `<br>(方格: ${hRows}x${hCols})`;
             if (isSettingMode) statusTitle.innerHTML = `[${modeDetail}]<br>${isFromTemplate ? '模板已載入' : '請點擊方格設定首盤'}${sizeInfo}${specialStatusText}`;
             else {
                 if (isTerminated && currentViewIdx === historyArrays.length - 1) statusTitle.innerHTML = `第 ${currentViewIdx} 盤${sizeInfo}<br><span style="color:red;">${terminationReason}</span>${specialStatusText}`;
@@ -648,7 +692,7 @@
             const nextRoundNum = roundNum + 1;
             checkTemplate1Status(nextRoundNum);
 
-            if (ruleMode > 3) {
+            if (ruleMode > 3 && currentTemplateId !== 10) {
                 if (!nextArray.some(r => r.includes(1))) {
                     historyArrays = [...historyArrays.slice(0, roundNum + 1), cloneGrid(nextArray)];
                     array = nextArray; roundNum = currentViewIdx = nextRoundNum;
