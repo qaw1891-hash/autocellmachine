@@ -179,13 +179,8 @@
     <div class="footer-credits">本程式大部分使用Gemini生成，由研究者提供想法。</div>
 
     <script>
-        // 【優化 1】極速二維陣列深拷貝函數，效能遠超 JSON.parse(JSON.stringify)
         const cloneGrid = arr => arr.map(row => [...row]);
-        
-        // 【優化 2】取代舊版容易碰撞的 arrayHash，採用絕對精準且快速的字串 Key
         const getGridKey = arr => arr.map(row => row.join('')).join('');
-
-        // 【優化 3】快速建立填滿 0 的二維陣列
         const createEmptyGrid = (r, c) => Array.from({ length: r }, () => new Array(c).fill(0));
 
         const ruleModeSelect = document.getElementById('rule-mode');
@@ -223,7 +218,7 @@
             7: `依照定理4(3)的敘述（此略），此模板以 a=2, b=2, k=9 作為範例。`,
             8: `此模式下，n=2^q, n*n應歸零，歸零盤次為2^q-1。此模板以 q=3, n=8 作為範例。`,
             9: `此模式下，n*n 的循環週期為 2^p-2^q。此模板以 n=7 作為範例（此時 p=3, q=0）。`,
-            10: `經典的二維細胞自動機。每個格子會檢查周圍 8 個鄰居（包含斜角）。<br>1. 活細胞周圍有 2 或 3 個活鄰居時繼續存活，其餘情況死亡。<br>2. 死細胞周圍恰有 3 個活鄰居時復活。<br>此模板初始為隨機生成，邊界大小為 15x15，超出邊界的細胞忽略不計。`
+            10: `經典的二維細胞自動機。每個格子會檢查周圍 8 個鄰居（包含斜角）。<br>1. 活細胞周圍有 2 或 3 個活鄰居時繼續存活，其餘情況死亡。<br>2. 死細胞周圍恰有 3 個活鄰居時復活。<br>此模板初始為隨機生成，採用無界擴張規則。`
         };
 
         function updateHelpPanel() {
@@ -235,7 +230,7 @@
                 let modeDetail = ruleNames[ruleMode];
                 if (ruleMode === 2 || ruleMode === 3) modeDetail += ` (${fixedDirection === 'cols' ? '固定行' : '固定列'})`;
                 else if (ruleMode === 5) modeDetail += ` (${fixedDirection === 'cols' ? '左右相接' : '上下相接'})`;
-                if (currentTemplateId === 10) modeDetail = "康威生命遊戲標準規則 (15x15 獨立邊界)";
+                if (currentTemplateId === 10) modeDetail = "康威生命遊戲標準規則 (無界擴張)";
 
                 text = `<strong>當前模板：</strong>${currentTplName}<br><strong>適用規則：</strong>${modeDetail}<br><strong>模板簡介：</strong><br>${templateIntroductions[currentTemplateId]}`;
             } else {
@@ -254,7 +249,7 @@
 
             const guidePanel = document.getElementById('operation-guide');
             if (guidePanel) {
-                guidePanel.innerHTML = isFromTemplate 
+                guidePanel.innerHTML = (isFromTemplate && currentTemplateId !== 10)
                     ? `<strong>💻 執行操作：</strong><ul><li style="color: #dc3545; font-weight: bold;">⚠️ 目前為內建模板模式，首盤「不能」切換黑白格狀態。</li><li>請直接點擊「開始播放」或方向鍵按鈕。</li></ul>`
                     : `<strong>💻 執行操作：</strong><ul><li>點擊方格可切換黑白格狀態，但開始播放後不得再次切換黑白格狀態。</li></ul>`;
             }
@@ -317,7 +312,7 @@
         let rows, cols, intervalSec, ruleMode, fixedDirection;
         let array = [];
         let historyArrays = [];
-        let seenPatterns = new Map(); // 【優化 2】改用 Map 提升查找效率
+        let seenPatterns = new Map();
         let roundNum = 0, currentViewIdx = 0;
         let isSettingMode = true, isPaused = true, isTerminated = false;
         let terminationReason = "", gameIntervalId = null;
@@ -356,7 +351,7 @@
         }
 
         canvas.addEventListener('pointerdown', (e) => {
-            if (!isSettingMode || e.button !== 0 || isFromTemplate) return;
+            if (!isSettingMode || e.button !== 0 || (isFromTemplate && currentTemplateId !== 10)) return;
             const rect = canvas.getBoundingClientRect();
             const mouseX = e.clientX - rect.left, mouseY = e.clientY - rect.top;
             const dispArr = historyArrays[currentViewIdx] || array;
@@ -366,7 +361,11 @@
             const clickRow = geo.yCoords.findIndex((y, i) => mouseY >= geo.offsetY + y && mouseY < geo.offsetY + geo.yCoords[i+1]);
 
             if (clickRow >= 0 && clickRow < array.length && clickCol >= 0 && clickCol < array[0].length) {
-                array[clickRow][clickCol] ^= 1; // 使用 XOR 切換 0/1 狀態，更簡潔
+                array[clickRow][clickCol] ^= 1;
+                // 同步歷史紀錄以確保即時顯示
+                if (isSettingMode && historyArrays.length > 0) {
+                    historyArrays[0] = cloneGrid(array);
+                }
                 render();
             }
         });
@@ -426,7 +425,7 @@
                     case 7: presetRule = 5; presetRows = 3; presetCols = 36; break;
                     case 8: presetRule = 6; presetRows = presetCols = 8; break;
                     case 9: presetRule = 6; presetRows = presetCols = 7; break;
-                    case 10: presetRule = 4; presetRows = presetCols = 15; break; // 康威生命遊戲設定 15x15 且有界
+                    case 10: presetRule = 1; presetRows = presetCols = 15; break; // 康威生命遊戲設定為無界
                 }
             }
 
@@ -441,7 +440,6 @@
                 case 5: array[0][7] = 1; break; case 6: array[0][3] = 1; break; case 7: array[0][17] = 1; break;
                 case 8: array[3][3] = 1; break; case 9: array[3][3] = 1; break;
                 case 10:
-                    // 隨機生成活細胞，給予大約 30% 的活細胞機率
                     for (let i = 0; i < rows; i++) {
                         for (let j = 0; j < cols; j++) {
                             array[i][j] = Math.random() < 0.3 ? 1 : 0;
@@ -470,8 +468,10 @@
         });
 
         clearBtn.addEventListener('click', () => {
-            if (!isSettingMode || isFromTemplate) return; 
+            if (!isSettingMode || (isFromTemplate && currentTemplateId !== 10)) return; 
             array = createEmptyGrid(rows, cols);
+            // 同步清空歷史紀錄以確保即時顯示全白
+            if (isSettingMode) historyArrays = [cloneGrid(array)]; 
             render();
         });
 
@@ -491,7 +491,7 @@
 
         function handlePlayPause() {
             if (isSettingMode) {
-                if (!array.some(r => r.includes(1)) && !isFromTemplate) return alert("首盤沒有設定任何塗色方格，請先點擊方格進行塗色！");
+                if (!array.some(r => r.includes(1)) && !isFromTemplate && currentTemplateId !== 10) return alert("首盤沒有設定任何塗色方格，請先點擊方格進行塗色！");
                 isSettingMode = isPaused = false;
                 historyArrays.push(cloneGrid(array));
                 if (ruleMode > 3) seenPatterns.set(getGridKey(array), 0);
@@ -528,7 +528,7 @@
         });
         nextBtn.addEventListener('click', () => {
             if (isSettingMode) {
-                if (!array.some(r => r.includes(1)) && !isFromTemplate) return alert("首盤沒有設定塗色方格，請先點擊方格進行塗色！");
+                if (!array.some(r => r.includes(1)) && !isFromTemplate && currentTemplateId !== 10) return alert("首盤沒有設定塗色方格，請先點擊方格進行塗色！");
                 isSettingMode = false; historyArrays = [cloneGrid(array)];
                 if (ruleMode > 3) { seenPatterns.clear(); seenPatterns.set(getGridKey(array), 0); }
                 currentViewIdx = roundNum = 0;
@@ -548,7 +548,7 @@
 
         function updateButtonUI() {
             if (isSettingMode) {
-                clearBtn.style.display = isFromTemplate ? "none" : "block"; 
+                clearBtn.style.display = (isFromTemplate && currentTemplateId !== 10) ? "none" : "block"; 
                 playPauseBtn.innerText = "開始播放"; playPauseBtn.className = "btn-ctrl btn-play";
                 prevBtn.disabled = nextBtn.disabled = true;
             } else {
@@ -562,43 +562,44 @@
         }
 
         function padArrayEdges(arr, mode) {
-            if (mode > 3) return arr;
+            // 如果是康威生命遊戲 (Template 10)，則視同無界進行邊緣擴展
+            if (mode > 3 && currentTemplateId !== 10) return arr;
             const r = arr.length, c = arr[0].length;
-            const allowTB = mode === 1 || fixedDirection !== 'rows';
-            const allowLR = mode === 1 || fixedDirection !== 'cols';
+            const allowTB = mode === 1 || fixedDirection !== 'rows' || currentTemplateId === 10;
+            const allowLR = mode === 1 || fixedDirection !== 'cols' || currentTemplateId === 10;
 
             const needT = allowTB && arr[0].includes(1), needB = allowTB && arr[r-1].includes(1);
             const needL = allowLR && arr.some(row => row[0] === 1), needR = allowLR && arr.some(row => row[c-1] === 1);
 
             if (!(needT || needB || needL || needR)) return arr;
 
-            const padT = allowTB ? 1 : 0, padL = allowLR ? 1 : 0;
-            const newArr = createEmptyGrid(r + (allowTB ? 2 : 0), c + (allowLR ? 2 : 0));
+            const padT = allowTB && needT ? 1 : 0, padL = allowLR && needL ? 1 : 0;
+            const padB = allowTB && needB ? 1 : 0, padR = allowLR && needR ? 1 : 0;
+            const newArr = createEmptyGrid(r + padT + padB, c + padL + padR);
             for (let i = 0; i < r; i++) for (let j = 0; j < c; j++) newArr[i + padT][j + padL] = arr[i][j];
             return newArr;
         }
 
         function updateArray(arr, mode) {
-            // 【特殊判定】當前為康威的生命遊戲模板時
             if (currentTemplateId === 10) {
+                // 自動向外擴張邊界
+                arr = padArrayEdges(arr, mode); 
+                
                 const r = arr.length, c = arr[0].length;
                 const newArr = createEmptyGrid(r, c);
                 for (let i = 0; i < r; i++) {
                     for (let j = 0; j < c; j++) {
                         let neighbors = 0;
-                        // 檢查周圍八個方向的鄰居
                         for (let di = -1; di <= 1; di++) {
                             for (let dj = -1; dj <= 1; dj++) {
                                 if (di === 0 && dj === 0) continue;
                                 const ni = i + di;
                                 const nj = j + dj;
-                                // 邊界外不予理會 (視為死細胞)
                                 if (ni >= 0 && ni < r && nj >= 0 && nj < c) {
                                     neighbors += arr[ni][nj];
                                 }
                             }
                         }
-                        // 康威生命遊戲的核心邏輯判定
                         if (arr[i][j] === 1) {
                             newArr[i][j] = (neighbors === 2 || neighbors === 3) ? 1 : 0;
                         } else {
@@ -622,7 +623,7 @@
                     if (i < r - 1) total += arr[i + 1][j]; else if (wrapTB) total += arr[0][j];
                     if (j > 0) total += arr[i][j - 1]; else if (wrapLR) total += arr[i][c - 1];
                     if (j < c - 1) total += arr[i][j + 1]; else if (wrapLR) total += arr[i][0];
-                    newArr[i][j] = total & 1; // 【優化 4】使用位元運算加速取餘數
+                    newArr[i][j] = total & 1; 
                 }
             }
             return newArr;
@@ -635,7 +636,6 @@
             const hRows = displayArray.length, hCols = displayArray[0].length;
             const geo = getGridGeometry(hRows, hCols);
 
-            // 【優化 5】Canvas 繪製效能優化：一次性填白背景，只針對 1 的區塊填黑
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, currentContainerSize, currentContainerSize);
             ctx.fillStyle = '#000000';
@@ -648,7 +648,6 @@
                 }
             }
 
-            // 畫格線
             ctx.strokeStyle = '#d0d0d0'; ctx.lineWidth = 1; ctx.beginPath();
             const startX = geo.offsetX + geo.xCoords[0] + 0.5, endX = geo.offsetX + geo.xCoords[hCols] + 0.5;
             const startY = geo.offsetY + geo.yCoords[0] + 0.5, endY = geo.offsetY + geo.yCoords[hRows] + 0.5;
@@ -660,13 +659,13 @@
             const wrapTB = ruleMode === 6 || (ruleMode === 5 && fixedDirection === 'rows') || (ruleMode === 3 && fixedDirection === 'rows');
 
             ctx.lineWidth = 1.25; 
-            if (wrapLR) {
+            if (wrapLR && currentTemplateId !== 10) {
                 ctx.strokeStyle = '#dc3545'; ctx.beginPath();
                 ctx.moveTo(geo.offsetX + geo.xCoords[0], geo.offsetY + geo.yCoords[0]); ctx.lineTo(geo.offsetX + geo.xCoords[0], geo.offsetY + geo.yCoords[hRows]);
                 ctx.moveTo(geo.offsetX + geo.xCoords[hCols], geo.offsetY + geo.yCoords[0]); ctx.lineTo(geo.offsetX + geo.xCoords[hCols], geo.offsetY + geo.yCoords[hRows]);
                 ctx.stroke();
             }
-            if (wrapTB) {
+            if (wrapTB && currentTemplateId !== 10) {
                 ctx.strokeStyle = '#007bff'; ctx.beginPath();
                 ctx.moveTo(geo.offsetX + geo.xCoords[0], geo.offsetY + geo.yCoords[0]); ctx.lineTo(geo.offsetX + geo.xCoords[hCols], geo.offsetY + geo.yCoords[0]);
                 ctx.moveTo(geo.offsetX + geo.xCoords[0], geo.offsetY + geo.yCoords[hRows]); ctx.lineTo(geo.offsetX + geo.xCoords[hCols], geo.offsetY + geo.yCoords[hRows]);
@@ -676,7 +675,7 @@
             let modeDetail = ruleNames[ruleMode];
             if (ruleMode === 2 || ruleMode === 3) modeDetail += ` (${fixedDirection === 'cols' ? '固定行' : '固定列'})`;
             else if (ruleMode === 5) modeDetail += ` (${fixedDirection === 'cols' ? '左右相接' : '上下相接'})`;
-            if (currentTemplateId === 10) modeDetail = "康威生命遊戲";
+            if (currentTemplateId === 10) modeDetail = "康威生命遊戲 (無界)";
             
             const sizeInfo = `<br>(方格: ${hRows}x${hCols})`;
             if (isSettingMode) statusTitle.innerHTML = `[${modeDetail}]<br>${isFromTemplate ? '模板已載入' : '請點擊方格設定首盤'}${sizeInfo}${specialStatusText}`;
